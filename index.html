@@ -744,6 +744,71 @@ blockquote {
   100% { top: 100%; opacity: 0; }
 }
 
+/* Step labels for flow diagram */
+.flow-step-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(0.6rem, 0.85vw, 0.72rem);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  margin-bottom: clamp(4px, 0.6vh, 8px);
+  margin-top: clamp(2px, 0.4vh, 6px);
+}
+
+/* V2 layout: two inputs merging into model */
+.flow-diagram-v2 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.flow-inputs {
+  display: flex;
+  gap: clamp(16px, 2.5vw, 32px);
+  width: 100%;
+}
+
+.flow-input-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.flow-input-col .flow-node {
+  width: 100%;
+}
+
+.flow-input-col .flow-connector {
+  margin: 0 auto;
+}
+
+.flow-merge {
+  width: 100%;
+  height: clamp(24px, 3.5vh, 36px);
+}
+
+.flow-merge-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.flow-user-prompt {
+  background: white;
+  border: 2px solid var(--accent-blue);
+  box-shadow: 0 4px 20px rgba(59, 111, 181, 0.1);
+}
+
+.flow-response {
+  background: white;
+  border: 2px solid var(--accent-green);
+  box-shadow: 0 4px 20px rgba(56, 161, 105, 0.1);
+}
+
 /* Hidden badge */
 .flow-hidden-badge {
   position: absolute;
@@ -1198,47 +1263,43 @@ body.overview-mode #nav-bar { display: none; }
       <p><strong>Key distinction:</strong> The <em>user prompt</em> is what someone types in the chat. The <em>system prompt</em> is what you, the instructor, compose behind the scenes to guide the AI&rsquo;s behavior across the entire conversation.</p>
     </div>
   </div>
-  <div class="stage" style="background: var(--bg-light); flex-direction: column; padding: clamp(16px, 2.5vh, 32px) clamp(12px, 1.5vw, 24px);">
+  <div class="stage" style="background: var(--bg-light); flex-direction: column; padding: clamp(12px, 2vh, 28px) clamp(12px, 1.5vw, 24px);">
     <div class="flow-diagram">
-      <!-- Instructor -->
-      <div class="flow-node flow-instructor">
+      <!-- Step 1: Instructor writes system prompt -->
+      <div class="flow-step-label">Before the conversation</div>
+      <div class="flow-node flow-instructor" style="width: 100%;">
         <div class="flow-node-icon">&#9997;&#65039;</div>
-        <div class="flow-node-label">You</div>
-        <div class="flow-node-desc">Write the prompt</div>
+        <div class="flow-node-label">You (Instructor)</div>
+        <div class="flow-node-desc">Write the system prompt</div>
       </div>
-      <!-- Connector 1 -->
       <div class="flow-connector">
         <div class="flow-connector-line"></div>
         <div class="flow-connector-arrow"></div>
       </div>
-      <!-- System Prompt -->
-      <div class="flow-node flow-prompt">
+      <div class="flow-node flow-prompt" style="width: 100%;">
         <span class="flow-hidden-badge">Hidden</span>
         <div class="flow-node-code">System Prompt</div>
-        <div class="flow-node-desc" style="font-family: 'JetBrains Mono', monospace; color: var(--accent-cyan); margin-top: 4px;">&ldquo;You are a tutor&hellip;&rdquo;</div>
+        <div class="flow-node-desc" style="font-family: 'JetBrains Mono', monospace; color: var(--accent-cyan); margin-top: 3px;">&ldquo;You are a tutor&hellip;&rdquo;</div>
       </div>
-      <!-- Connector 2 (hidden/dashed) -->
       <div class="flow-connector connector-hidden">
         <div class="flow-connector-line"></div>
         <div class="flow-connector-arrow"></div>
       </div>
-      <!-- AI Model -->
-      <div class="flow-node flow-model">
-        <div class="flow-node-icon" style="font-size: 1.6rem;">&#129302;</div>
-        <div class="flow-node-label">AI Model</div>
-        <div class="flow-node-desc">Behavior shaped</div>
+      <!-- Step 2: Student sends user prompt, model responds -->
+      <div class="flow-step-label" style="color: var(--accent-blue);">During the conversation</div>
+      <div class="flow-node flow-student" style="width: 100%;">
+        <div class="flow-node-icon">&#128100;</div>
+        <div class="flow-node-label">Student</div>
+        <div class="flow-node-desc">&ldquo;I&rsquo;m stuck on my intro&hellip;&rdquo;</div>
       </div>
-      <!-- Connector 3 -->
       <div class="flow-connector connector-shaped">
         <div class="flow-connector-line"></div>
         <div class="flow-connector-arrow"></div>
-        <span class="flow-connector-label">responds</span>
       </div>
-      <!-- Student -->
-      <div class="flow-node flow-student">
-        <div class="flow-node-icon">&#128100;</div>
-        <div class="flow-node-label">Student</div>
-        <div class="flow-node-desc">Sees only responses</div>
+      <div class="flow-node flow-model" style="width: 100%;">
+        <div class="flow-node-icon" style="font-size: 1.4rem;">&#129302;</div>
+        <div class="flow-node-label">AI Model</div>
+        <div class="flow-node-desc">Shaped by system prompt</div>
       </div>
     </div>
   </div>
