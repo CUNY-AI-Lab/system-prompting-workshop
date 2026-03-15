@@ -44,7 +44,7 @@ In the CUNY AI Lab Sandbox, you'll find the system prompt field in two places:
 1. **Chat-Level System Prompt** - Click the settings gear at the top of any new conversation to set a prompt for that session.
 2. **Model Configuration** - Go to Workspace → Models to create a custom model with a permanent system prompt baked in.
 
-**Note:** Custom models combine your system prompt with knowledge collections to ground the AI, situating learning and enabling instructional reuse. We'll come back to this next time.
+**Note:** Next time, we'll create custom models that combine your system prompt with a knowledge collection of course materials to ground the AI and situate learning in your teaching context.
 
 ---
 

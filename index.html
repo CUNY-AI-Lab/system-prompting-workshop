@@ -550,19 +550,19 @@ The core problem: students summarize plot rather than analyzing how language, fo
     <ul style="margin-top: 1em; line-height: 1.9;">
       <li>What kind of tool is this?</li>
       <li>Who are your students?</li>
-      <li>What learning problem does it solve?</li>
+      <li>What learning challenge does it address?</li>
     </ul>
   </div>
   <div class="stage" style="flex-direction: column; justify-content: center; padding: clamp(16px, 2.5vw, 40px);">
     <div style="position: relative;">
-      <button class="copy-btn" onclick="copyTemplate('tpl-context')" title="Copy template">&#128203;</button>
+      <button class="copy-btn" onclick="copyTemplate('tpl-context')" title="Copy template">Copy</button>
       <pre id="tpl-context" class="prompt-block prompt-mid" style="white-space: pre-wrap; font-family: inherit; margin: 0;">You are a [tool type] for [course name].
 Students are [relevant context].
 
 The core problem: [specific learning challenge].</pre>
     </div>
     <div class="tip-box" style="margin-top: 1.2em;">
-      <p><strong>Your turn:</strong> Open the Sandbox. Write 2-3 sentences naming what the tool does, who the students are, and what problem it solves.</p>
+      <p><strong>Your turn:</strong> Open the Sandbox. Write 2-3 sentences naming what the tool does, who the students are, and what learning challenge it addresses.</p>
     </div>
   </div>
 </div>
@@ -576,14 +576,14 @@ The core problem: [specific learning challenge].</pre>
     <h2>Procedure</h2>
     <p>Tell the tool what to do, step by step. Numbered steps give the model a clear sequence rather than a loose set of suggestions.</p>
     <ul style="margin-top: 1em; line-height: 1.9;">
-      <li>What should the tool ask for first?</li>
+      <li>What should the tool request before responding?</li>
       <li>What should it prioritize?</li>
       <li>How should it respond to each student input?</li>
     </ul>
   </div>
   <div class="stage" style="flex-direction: column; justify-content: center; padding: clamp(16px, 2.5vw, 40px);">
     <div style="position: relative;">
-      <button class="copy-btn" onclick="copyTemplate('tpl-procedure')" title="Copy template">&#128203;</button>
+      <button class="copy-btn" onclick="copyTemplate('tpl-procedure')" title="Copy template">Copy</button>
       <pre id="tpl-procedure" class="prompt-block prompt-mid" style="white-space: pre-wrap; font-family: inherit; margin: 0;">Procedure:
 1. Ask the student for [specific input] before responding.
 2. Identify [priority concern] before addressing [secondary concerns].
@@ -611,7 +611,7 @@ The core problem: [specific learning challenge].</pre>
   </div>
   <div class="stage" style="flex-direction: column; justify-content: center; padding: clamp(16px, 2.5vw, 40px);">
     <div style="position: relative;">
-      <button class="copy-btn" onclick="copyTemplate('tpl-constraints')" title="Copy template">&#128203;</button>
+      <button class="copy-btn" onclick="copyTemplate('tpl-constraints')" title="Copy template">Copy</button>
       <pre id="tpl-constraints" class="prompt-block prompt-mid" style="white-space: pre-wrap; font-family: inherit; margin: 0;">Constraints:
 - Never [specific output to avoid].
 - If asked to [common student request], redirect by [specific alternative].
@@ -633,13 +633,13 @@ The core problem: [specific learning challenge].</pre>
     <p>One sentence on tone shapes how the tool communicates with every student it encounters.</p>
     <ul style="margin-top: 1em; line-height: 1.9;">
       <li>What register fits your students?</li>
-      <li>Should it feel supportive, neutral, rigorous?</li>
+      <li>Should it feel warm, direct, encouraging?</li>
       <li>Are there phrases that model the right affect?</li>
     </ul>
   </div>
   <div class="stage" style="flex-direction: column; justify-content: center; padding: clamp(16px, 2.5vw, 40px);">
     <div style="position: relative;">
-      <button class="copy-btn" onclick="copyTemplate('tpl-tone')" title="Copy template">&#128203;</button>
+      <button class="copy-btn" onclick="copyTemplate('tpl-tone')" title="Copy template">Copy</button>
       <pre id="tpl-tone" class="prompt-block prompt-mid" style="white-space: pre-wrap; font-family: inherit; margin: 0;">Tone: [Adjective and adjective]. Use phrases like "[example phrase]" and "[example phrase]."</pre>
     </div>
     <div class="tip-box" style="margin-top: 1.2em;">
@@ -664,7 +664,7 @@ The core problem: [specific learning challenge].</pre>
   </div>
   <div class="stage" style="flex-direction: column; justify-content: center; padding: clamp(16px, 2.5vw, 40px);">
     <div style="position: relative;">
-      <button class="copy-btn" onclick="copyTemplate('tpl-format')" title="Copy template">&#128203;</button>
+      <button class="copy-btn" onclick="copyTemplate('tpl-format')" title="Copy template">Copy</button>
       <pre id="tpl-format" class="prompt-block prompt-mid" style="white-space: pre-wrap; font-family: inherit; margin: 0;">Format each response as:
 Observation: [what you notice]
 Focus: [one thing to work on]
@@ -815,6 +815,16 @@ Question: [something for the student to consider]</pre>
 </div>
 
 
+<script>
+function copyTemplate(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.innerText).then(function() {
+    var btn = document.querySelector('[onclick="copyTemplate(\'' + id + '\')"]');
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(function() { btn.textContent = 'Copy'; }, 1500); }
+  });
+}
+</script>
 <script src="js/tabs.js"></script>
 <script src="js/carousel.js"></script>
 <script src="js/scrubber.js"></script>

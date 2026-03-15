@@ -1382,6 +1382,33 @@ body.overview-mode #nav-bar { display: none; }
 }
 
 /* ============================================
+   COPY BUTTON
+   ============================================ */
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  z-index: 5;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(226, 232, 240, 0.15);
+  border-radius: 4px;
+  color: rgba(226, 232, 240, 0.5);
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  cursor: pointer;
+  line-height: 1.6;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  font-family: 'DM Sans', sans-serif;
+  user-select: none;
+}
+
+.copy-btn:hover {
+  background: rgba(78, 205, 196, 0.12);
+  border-color: rgba(78, 205, 196, 0.35);
+  color: var(--accent-cyan);
+}
+
+/* ============================================
    ARROW NAVIGATION BUTTONS
    ============================================ */
 .arrow-btn {
@@ -1482,3 +1509,20 @@ body.overview-mode #nav-bar { display: none; }
   .scrubber-container { margin: 0 8px; }
   .arrow-btn { min-width: 36px; min-height: 36px; padding: 4px 8px; }
 }
+
+/* Copy Button */
+.copy-btn {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--light-text);
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  z-index: 2;
+}
+.copy-btn:hover { background: rgba(255,255,255,0.15); color: var(--accent-cyan); }
