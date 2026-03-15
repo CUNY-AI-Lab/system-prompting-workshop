@@ -568,6 +568,108 @@ blockquote {
 }
 
 /* ============================================
+   FLOW DIAGRAM (Slide 3)
+   ============================================ */
+.flow-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.flow-node {
+  text-align: center;
+  padding: clamp(12px, 1.5vh, 20px) clamp(16px, 2vw, 28px);
+  border-radius: 10px;
+  width: 100%;
+  position: relative;
+}
+
+.flow-node-icon {
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.flow-node-label {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.85rem, 1.2vw, 1rem);
+  color: var(--text-dark);
+  margin-bottom: 2px;
+}
+
+.flow-node-desc {
+  font-size: clamp(0.72rem, 1vw, 0.85rem);
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.flow-node-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+  font-size: clamp(0.82rem, 1.15vw, 0.95rem);
+  color: var(--text-dark);
+}
+
+.flow-instructor {
+  background: white;
+  border: 2px solid var(--accent-cyan);
+  box-shadow: 0 2px 12px rgba(78, 205, 196, 0.12);
+}
+
+.flow-prompt {
+  background: var(--code-bg);
+  border: 2px solid rgba(78, 205, 196, 0.3);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+}
+
+.flow-prompt .flow-node-code {
+  color: var(--light-text);
+}
+
+.flow-prompt .flow-node-desc {
+  color: var(--accent-cyan);
+}
+
+.flow-model {
+  background: white;
+  border: 2px solid var(--accent-blue);
+  box-shadow: 0 2px 12px rgba(59, 111, 181, 0.12);
+}
+
+.flow-student {
+  background: white;
+  border: 2px solid var(--accent-blue);
+  box-shadow: 0 2px 12px rgba(59, 111, 181, 0.08);
+}
+
+.flow-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  height: 40px;
+}
+
+.flow-arrow-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  position: absolute;
+  right: -80px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+/* ============================================
    CAROUSEL
    ============================================ */
 .carousel {
@@ -975,10 +1077,42 @@ body.overview-mode #nav-bar { display: none; }
       <p><strong>Key distinction:</strong> The <em>user prompt</em> is what someone types in the chat. The <em>system prompt</em> is what you, the instructor, compose behind the scenes to guide the AI&rsquo;s behavior across the entire conversation.</p>
     </div>
   </div>
-  <div class="stage">
-    <div class="screenshot-placeholder">
-      <div class="placeholder-icon">&#128247;</div>
-      <div class="placeholder-text"><strong>Screenshot needed:</strong><br>Diagram showing System Prompt &rarr; Model &rarr; User sees response (but not the system prompt)</div>
+  <div class="stage" style="background: var(--bg-light); flex-direction: column; padding: clamp(20px, 3vh, 40px) clamp(16px, 2vw, 32px);">
+    <div class="flow-diagram">
+      <!-- Instructor layer -->
+      <div class="flow-node flow-instructor">
+        <div class="flow-node-icon">&#9997;&#65039;</div>
+        <div class="flow-node-label">You (Instructor)</div>
+        <div class="flow-node-desc">Write the system prompt</div>
+      </div>
+      <div class="flow-arrow flow-arrow-down">
+        <svg width="24" height="40" viewBox="0 0 24 40"><path d="M12 0 L12 32 M4 24 L12 34 L20 24" stroke="var(--accent-cyan)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <!-- System prompt box -->
+      <div class="flow-node flow-prompt">
+        <div class="flow-node-code">System Prompt</div>
+        <div class="flow-node-desc" style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--accent-cyan); margin-top: 4px;">&ldquo;You are a writing tutor&hellip;&rdquo;</div>
+      </div>
+      <div class="flow-arrow flow-arrow-down">
+        <svg width="24" height="40" viewBox="0 0 24 40"><path d="M12 0 L12 32 M4 24 L12 34 L20 24" stroke="var(--accent-cyan)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="flow-arrow-label">hidden</span>
+      </div>
+      <!-- Model -->
+      <div class="flow-node flow-model">
+        <div class="flow-node-icon" style="font-size: 1.6rem;">&#129302;</div>
+        <div class="flow-node-label">AI Model</div>
+        <div class="flow-node-desc">Follows system prompt instructions</div>
+      </div>
+      <div class="flow-arrow flow-arrow-down">
+        <svg width="24" height="40" viewBox="0 0 24 40"><path d="M12 0 L12 32 M4 24 L12 34 L20 24" stroke="var(--accent-blue)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="flow-arrow-label">shaped by prompt</span>
+      </div>
+      <!-- Student -->
+      <div class="flow-node flow-student">
+        <div class="flow-node-icon">&#128100;</div>
+        <div class="flow-node-label">Student</div>
+        <div class="flow-node-desc">Sees responses, never the system prompt</div>
+      </div>
     </div>
   </div>
 </div>
