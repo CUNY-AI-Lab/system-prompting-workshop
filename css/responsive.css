@@ -1,0 +1,81 @@
+@media (max-width: 1024px) {
+  html { font-size: 85%; }
+  h1 { font-size: clamp(1.8rem, 5vw, 3rem); }
+  h2 { font-size: clamp(1.4rem, 3.2vw, 2.2rem); }
+  h3 { font-size: clamp(1rem, 2.2vw, 1.5rem); }
+  .layout-split > .content { padding: clamp(16px, 2.5vh, 32px) clamp(20px, 2vw, 40px); }
+  .layout-split > .stage { padding: clamp(16px, 2vh, 24px); }
+}
+
+@media (max-width: 768px) {
+  html { font-size: 80%; }
+  h1 { font-size: clamp(1.6rem, 4.5vw, 2.6rem); }
+  h2 { font-size: clamp(1.2rem, 3vw, 1.8rem); }
+  h3 { font-size: clamp(0.95rem, 2vw, 1.3rem); }
+  h4 { font-size: clamp(0.9rem, 1.5vw, 1.1rem); }
+
+  .layout-split { flex-direction: column; }
+  .layout-split > .content {
+    flex: 0 0 auto;
+    padding: clamp(16px, 2.5vh, 28px) clamp(16px, 2vw, 32px);
+    min-height: 50vh;
+    overflow-y: auto;
+  }
+  .layout-split > .stage {
+    flex: 1;
+    min-height: 50vh;
+    padding: clamp(12px, 1.5vh, 20px);
+  }
+
+  .layout-full-dark, .layout-full-light, .layout-content {
+    padding: clamp(16px, 2.5vh, 28px) clamp(16px, 2vw, 32px) !important;
+  }
+
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .comparison { grid-template-columns: 1fr; }
+  .roadmap { flex-direction: column; gap: 0; }
+  .roadmap-item { border-radius: 0; border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+  .roadmap-item:first-child { border-radius: 8px 8px 0 0; }
+  .roadmap-item:last-child { border-radius: 0 0 8px 8px; border-bottom: none; }
+  .model-grid { grid-template-columns: 1fr; }
+
+  blockquote { margin-left: clamp(12px, 2vw, 16px); }
+  code { font-size: 0.85em; }
+  pre { font-size: 0.8em; }
+
+  .tip-box { padding: clamp(12px, 2vw, 16px); }
+
+  body.overview-mode .slide { width: calc(50% - 8px); }
+}
+
+@media (max-width: 480px) {
+  html { font-size: 75%; }
+  body { font-size: 0.95rem; }
+
+  h1 { font-size: clamp(1.4rem, 6vw, 2.2rem); }
+  h2 { font-size: clamp(1rem, 3.5vw, 1.6rem); }
+  h3 { font-size: clamp(0.9rem, 2.5vw, 1.2rem); }
+  h4 { font-size: clamp(0.85rem, 1.8vw, 1rem); }
+
+  .layout-split > .content {
+    min-height: 45vh;
+    padding: clamp(12px, 2vh, 20px) clamp(12px, 1.5vw, 20px);
+  }
+  .layout-split > .stage {
+    min-height: 45vh;
+    padding: clamp(8px, 1vh, 16px);
+  }
+
+  .title-slide-content { padding: clamp(20px, 5vw, 32px); }
+  .title-logo { max-height: 60px; }
+
+  .label { font-size: 0.75rem; padding: 4px 8px; }
+  blockquote { font-size: 0.95rem; }
+  code { font-size: 0.8em; }
+  pre { font-size: 0.75em; overflow-x: auto; }
+
+  .flow-node { padding: clamp(6px, 1.5vh, 10px) clamp(6px, 1vw, 12px); }
+  .flow-node-label { font-size: 0.7rem; }
+
+  .modal-prompt { width: 90vw; max-height: 85vh; }
+}
