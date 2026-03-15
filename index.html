@@ -900,9 +900,20 @@ body.overview-mode #nav-bar { display: none; }
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: clamp(30px, 5vh, 80px) clamp(30px, 5vw, 100px);
-  position: relative;
+  padding: 0;
   overflow: hidden;
+}
+
+.title-slide-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  z-index: 1;
+  padding: clamp(30px, 5vh, 80px) clamp(30px, 5vw, 100px);
 }
 
 .title-slide::before {
@@ -1045,10 +1056,12 @@ body.overview-mode #nav-bar { display: none; }
      SLIDE 1 — TITLE
      ========================================== -->
 <div class="slide title-slide">
-  <img src="logo-horizontal.png" alt="CUNY AI Lab" class="title-logo">
-  <h1>Composing System Prompts</h1>
-  <p class="subtitle">A Workshop for the CUNY AI Lab Sandbox</p>
-  <p class="meta">March 16, 2026</p>
+  <div class="title-slide-content">
+    <img src="logo-horizontal.png" alt="CUNY AI Lab" class="title-logo">
+    <h1>Composing System Prompts</h1>
+    <p class="subtitle">A Workshop for the CUNY AI Lab Sandbox</p>
+    <p class="meta">March 16, 2026</p>
+  </div>
 </div>
 
 <!-- ==========================================
@@ -1811,6 +1824,7 @@ When a student shares a primary source, walk them through these questions one at
      SLIDE 30 — CLOSING / EXERCISE
      ========================================== -->
 <div class="slide title-slide closing-slide">
+  <div class="title-slide-content">
   <img src="logo-horizontal.png" alt="CUNY AI Lab" class="title-logo" style="margin-bottom: clamp(12px, 2vh, 24px);">
   <h1 style="font-size: clamp(2rem, 4.5vw, 3.2rem); margin-bottom: 0.2em;">Let&rsquo;s Build One Together</h1>
   <p class="subtitle" style="margin-bottom: 1em;">Open the CUNY AI Lab sandbox and compose a system prompt for your course</p>
@@ -1832,6 +1846,7 @@ When a student shares a primary source, walk them through these questions one at
     </div>
   </div>
   <p class="meta" style="margin-top: 0.8em;">ailab.gc.cuny.edu</p>
+  </div>
 </div>
 
 </div><!-- /deck -->
