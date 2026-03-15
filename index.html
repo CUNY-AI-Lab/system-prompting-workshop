@@ -1,0 +1,1726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Composing System Prompts — CUNY AI Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,800;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 90%; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  background: #0B1D3A;
+  color: #1a2332;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================
+   DESIGN TOKENS
+   ============================================ */
+:root {
+  --bg-light: #F0F4F8;
+  --bg-panel: #E2E8F0;
+  --text-dark: #0B1D3A;
+  --text-muted: #4A5568;
+  --accent-navy: #0B1D3A;
+  --accent-blue: #3B6FB5;
+  --accent-cyan: #4ECDC4;
+  --accent-light-blue: #6FA8DC;
+  --accent-red: #E53E3E;
+  --accent-amber: #D69E2E;
+  --accent-green: #38A169;
+  --dark-bg: #0B1D3A;
+  --dark-bg-lighter: #132D54;
+  --light-text: #E2E8F0;
+  --light-text-50: rgba(226, 232, 240, 0.5);
+  --code-bg: #1a1a2e;
+  --code-text: #e2e8f0;
+}
+
+/* ============================================
+   DECK ENGINE
+   ============================================ */
+#deck {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+  overflow: hidden;
+}
+
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+  z-index: 2;
+}
+
+/* ============================================
+   LAYOUT TYPES
+   ============================================ */
+
+/* Split-screen: content left, stage right */
+.layout-split {
+  flex-direction: row;
+  background: var(--bg-light);
+}
+
+.layout-split > .content {
+  flex: 0 0 50%;
+  padding: clamp(20px, 3vh, 45px) clamp(24px, 2.5vw, 50px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.layout-split > .content::-webkit-scrollbar { display: none; }
+
+.layout-split > .stage {
+  flex: 1;
+  position: relative;
+  background: var(--bg-panel);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Full-bleed dark */
+.layout-full-dark {
+  background: var(--dark-bg);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(30px, 5vh, 80px) clamp(30px, 5vw, 100px);
+  background-image:
+    radial-gradient(ellipse at 70% 20%, rgba(59, 111, 181, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 80%, rgba(78, 205, 196, 0.04) 0%, transparent 50%);
+}
+
+.layout-full-dark h1,
+.layout-full-dark h2,
+.layout-full-dark h3,
+.layout-full-dark p,
+.layout-full-dark li,
+.layout-full-dark .label {
+  color: var(--light-text);
+}
+
+/* Full-bleed light */
+.layout-full-light {
+  background: var(--bg-light);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(30px, 5vh, 80px) clamp(40px, 5vw, 120px);
+  background-image:
+    radial-gradient(ellipse at 80% 20%, rgba(59, 111, 181, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 70%, rgba(78, 205, 196, 0.03) 0%, transparent 50%);
+}
+
+/* Section divider */
+.layout-divider {
+  background: var(--dark-bg);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px;
+}
+
+.layout-divider::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 70%, rgba(78, 205, 196, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 30%, rgba(59, 111, 181, 0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.layout-divider .section-label {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: clamp(0.85rem, 1.3vw, 1.05rem);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--accent-cyan);
+  margin-bottom: 1.5em;
+  position: relative;
+}
+
+.layout-divider h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: var(--light-text);
+  line-height: 1.15;
+  max-width: 20ch;
+  position: relative;
+  letter-spacing: -0.02em;
+}
+
+.layout-divider .divider-line {
+  width: 60px;
+  height: 3px;
+  background: var(--accent-cyan);
+  margin-top: 2em;
+  position: relative;
+}
+
+/* Grid layout */
+.layout-grid {
+  background: var(--bg-light);
+  flex-direction: column;
+  padding: clamp(24px, 3.5vh, 50px) clamp(40px, 5vw, 80px);
+  justify-content: center;
+  background-image:
+    radial-gradient(ellipse at 80% 20%, rgba(59, 111, 181, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 10% 90%, rgba(78, 205, 196, 0.03) 0%, transparent 50%);
+}
+
+/* Content-heavy layout for prompt examples */
+.layout-content {
+  background: var(--bg-light);
+  flex-direction: column;
+  padding: clamp(20px, 3vh, 40px) clamp(40px, 5vw, 100px);
+  justify-content: center;
+  overflow-y: auto;
+  scrollbar-width: none;
+  background-image:
+    radial-gradient(ellipse at 90% 10%, rgba(59, 111, 181, 0.03) 0%, transparent 50%);
+}
+.layout-content::-webkit-scrollbar { display: none; }
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+h1, h2, h3, h4 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 700;
+  color: var(--text-dark);
+  line-height: 1.15;
+}
+
+h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); }
+h2 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); margin-bottom: 0.5em; }
+h3 { font-size: clamp(1.2rem, 2.2vw, 1.6rem); margin-bottom: 0.4em; }
+h4 { font-size: clamp(1.05rem, 1.6vw, 1.25rem); margin-bottom: 0.3em; }
+
+p, li {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+ul { list-style: none; padding-left: 0; }
+ul li { padding-left: 1.2em; position: relative; margin-bottom: 0.4em; }
+ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+}
+
+.label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(0.78rem, 1.15vw, 0.95rem);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 600;
+  margin-bottom: 0.8em;
+  display: block;
+}
+
+.label-cyan { color: var(--accent-cyan); }
+.label-blue { color: var(--accent-blue); }
+.label-navy { color: var(--accent-navy); }
+
+strong { color: var(--text-dark); font-weight: 700; }
+
+blockquote {
+  font-style: italic;
+  font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+  color: var(--text-muted);
+  border-left: 3px solid var(--accent-cyan);
+  padding-left: 1em;
+  margin: 1em 0;
+}
+
+/* ============================================
+   COMPONENTS
+   ============================================ */
+
+/* Cards */
+.card {
+  background: var(--bg-panel);
+  border-radius: 8px;
+  padding: clamp(12px, 1.5vh, 20px) clamp(16px, 2vw, 24px);
+  margin-bottom: 0.8em;
+  border-left: 3px solid var(--accent-blue);
+}
+
+.card-cyan { border-left-color: var(--accent-cyan); }
+.card-navy { border-left-color: var(--accent-navy); }
+
+.card h4 { margin-bottom: 0.2em; }
+.card p { font-size: clamp(0.9rem, 1.3vw, 1.1rem); margin-bottom: 0; }
+
+/* Prompt display blocks */
+.prompt-block {
+  background: var(--code-bg);
+  color: var(--code-text);
+  border-radius: 8px;
+  padding: clamp(14px, 2vh, 24px) clamp(16px, 2vw, 28px);
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  font-size: clamp(0.82rem, 1.2vw, 1rem);
+  line-height: 1.65;
+  margin: 0.8em 0;
+  position: relative;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.prompt-block .prompt-label {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.prompt-bad .prompt-label { background: rgba(229, 62, 62, 0.2); color: var(--accent-red); }
+.prompt-mid .prompt-label { background: rgba(214, 158, 46, 0.2); color: var(--accent-amber); }
+.prompt-good .prompt-label { background: rgba(56, 161, 105, 0.2); color: var(--accent-green); }
+
+.prompt-bad { border-left: 3px solid var(--accent-red); }
+.prompt-mid { border-left: 3px solid var(--accent-amber); }
+.prompt-good { border-left: 3px solid var(--accent-green); }
+
+/* Quality indicator badges */
+.quality-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: clamp(0.8rem, 1.1vw, 0.95rem);
+  font-weight: 600;
+  margin-bottom: 0.6em;
+}
+
+.badge-bad { background: rgba(229, 62, 62, 0.12); color: var(--accent-red); }
+.badge-mid { background: rgba(214, 158, 46, 0.12); color: var(--accent-amber); }
+.badge-good { background: rgba(56, 161, 105, 0.12); color: var(--accent-green); }
+
+/* Grid helpers */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(12px, 2vw, 24px);
+  width: 100%;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(12px, 2vw, 24px);
+  width: 100%;
+}
+
+/* Roadmap timeline */
+.roadmap {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  max-width: 900px;
+  margin: 2em auto;
+}
+
+.roadmap-item {
+  flex: 1;
+  padding: clamp(16px, 2vh, 28px) clamp(14px, 1.5vw, 24px);
+  background: var(--dark-bg-lighter);
+  border-top: 3px solid var(--accent-blue);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.roadmap-item.active {
+  background: rgba(78, 205, 196, 0.1);
+  border-top-color: var(--accent-cyan);
+  transform: scale(1.03);
+}
+
+.roadmap-item:first-child { border-radius: 8px 0 0 8px; }
+.roadmap-item:last-child { border-radius: 0 8px 8px 0; }
+
+.roadmap-item .week-label {
+  font-size: clamp(0.7rem, 1vw, 0.85rem);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent-cyan);
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+
+.roadmap-item h4 {
+  color: var(--light-text);
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+  margin-bottom: 0.3em;
+}
+
+.roadmap-item p {
+  font-size: clamp(0.8rem, 1.1vw, 0.95rem);
+  color: var(--light-text-50);
+  line-height: 1.4;
+}
+
+/* Screenshot placeholder */
+.screenshot-placeholder {
+  background: var(--bg-panel);
+  border: 2px dashed #CBD5E0;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(20px, 3vh, 40px);
+  color: var(--text-muted);
+  min-height: 200px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.screenshot-placeholder .placeholder-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5em;
+  opacity: 0.5;
+}
+
+.screenshot-placeholder .placeholder-text {
+  font-size: clamp(0.85rem, 1.2vw, 1rem);
+  text-align: center;
+  max-width: 300px;
+}
+
+/* Screenshot image (replaces placeholder) */
+.screenshot-img {
+  max-width: 100%;
+  max-height: 55vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Dark screenshot placeholder */
+.screenshot-placeholder-dark {
+  background: var(--dark-bg-lighter);
+  border-color: rgba(226, 232, 240, 0.15);
+  color: var(--light-text-50);
+}
+
+/* Model list */
+.model-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: clamp(8px, 1.2vw, 14px);
+  width: 100%;
+  max-width: 1000px;
+}
+
+.model-card {
+  background: var(--dark-bg-lighter);
+  border-radius: 8px;
+  padding: clamp(10px, 1.5vh, 18px) clamp(12px, 1.5vw, 20px);
+  border-left: 3px solid var(--accent-blue);
+}
+
+.model-card h4 {
+  color: var(--light-text);
+  font-size: clamp(0.85rem, 1.2vw, 1rem);
+  margin-bottom: 0.2em;
+}
+
+.model-card p {
+  color: var(--light-text-50);
+  font-size: clamp(0.75rem, 1vw, 0.88rem);
+  line-height: 1.4;
+}
+
+/* Building blocks icons */
+.block-card {
+  background: white;
+  border-radius: 10px;
+  padding: clamp(16px, 2vh, 28px) clamp(14px, 1.5vw, 24px);
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease;
+}
+
+.block-card:hover { transform: translateY(-2px); }
+
+.block-icon {
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  margin-bottom: 0.5em;
+  display: block;
+}
+
+.block-card h4 {
+  font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+  margin-bottom: 0.3em;
+}
+
+.block-card p {
+  font-size: clamp(0.82rem, 1.1vw, 0.95rem);
+  line-height: 1.4;
+}
+
+/* Comparison side-by-side */
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(16px, 2vw, 28px);
+  width: 100%;
+  margin: 1em 0;
+}
+
+.comparison-panel {
+  background: var(--code-bg);
+  border-radius: 8px;
+  padding: clamp(14px, 2vh, 24px);
+  color: var(--code-text);
+}
+
+.comparison-panel h4 {
+  color: var(--light-text);
+  font-size: clamp(0.9rem, 1.2vw, 1.05rem);
+  margin-bottom: 0.6em;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.1);
+}
+
+.comparison-panel p, .comparison-panel li {
+  font-size: clamp(0.85rem, 1.1vw, 0.98rem);
+  color: rgba(226, 232, 240, 0.8);
+  line-height: 1.5;
+}
+
+.comparison-panel.panel-muted {
+  opacity: 0.6;
+}
+
+/* Tip callout */
+.tip-box {
+  background: rgba(78, 205, 196, 0.08);
+  border-left: 3px solid var(--accent-cyan);
+  border-radius: 0 8px 8px 0;
+  padding: clamp(10px, 1.5vh, 18px) clamp(14px, 1.5vw, 22px);
+  margin: 0.8em 0;
+}
+
+.tip-box p {
+  font-size: clamp(0.88rem, 1.2vw, 1.05rem);
+  color: var(--text-muted);
+}
+
+.tip-box strong {
+  color: var(--accent-navy);
+}
+
+/* Warning callout */
+.warning-box {
+  background: rgba(214, 158, 46, 0.08);
+  border-left: 3px solid var(--accent-amber);
+  border-radius: 0 8px 8px 0;
+  padding: clamp(10px, 1.5vh, 18px) clamp(14px, 1.5vw, 22px);
+  margin: 0.8em 0;
+}
+
+/* ============================================
+   LOGO WATERMARK
+   ============================================ */
+.logo-watermark {
+  position: fixed;
+  top: clamp(12px, 2vh, 18px);
+  right: clamp(12px, 2vw, 18px);
+  height: clamp(22px, 3vh, 32px);
+  opacity: 0.15;
+  z-index: 100;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+
+/* JS controls visibility — hidden by default on title/closing */
+.logo-watermark.hidden { opacity: 0; }
+
+/* ============================================
+   NAVIGATION BAR
+   ============================================ */
+#nav-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 20px;
+  background: rgba(11, 29, 58, 0.9);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+#nav-bar.visible { opacity: 1; }
+#nav-bar:hover { opacity: 1; }
+
+#nav-bar .nav-info {
+  font-size: 0.8rem;
+  color: var(--light-text-50);
+  font-weight: 500;
+}
+
+#nav-bar .nav-info strong {
+  color: var(--accent-cyan);
+}
+
+#progress-track {
+  flex: 1;
+  height: 2px;
+  background: rgba(226, 232, 240, 0.1);
+  margin: 0 20px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+#progress-bar {
+  height: 100%;
+  background: var(--accent-cyan);
+  width: 0%;
+  transition: width 0.4s ease;
+  border-radius: 2px;
+}
+
+#nav-bar .nav-keys {
+  font-size: 0.72rem;
+  color: var(--light-text-50);
+}
+
+#nav-bar .nav-keys kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid rgba(226, 232, 240, 0.2);
+  border-radius: 3px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.68rem;
+  margin: 0 2px;
+}
+
+/* ============================================
+   OVERVIEW MODE
+   ============================================ */
+body.overview-mode #deck {
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 24px;
+  background: #060d18;
+  align-content: flex-start;
+}
+
+body.overview-mode .slide {
+  position: relative;
+  width: calc(25% - 12px);
+  height: auto;
+  aspect-ratio: 16 / 9;
+  opacity: 1;
+  visibility: visible;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  transform: scale(1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+body.overview-mode .slide:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 20px rgba(78, 205, 196, 0.2);
+}
+
+body.overview-mode .slide.active {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+body.overview-mode #nav-bar { display: none; }
+
+/* ============================================
+   SPECIAL SLIDE STYLES
+   ============================================ */
+
+/* Title slide */
+.title-slide {
+  background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-lighter) 100%);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(30px, 5vh, 80px) clamp(30px, 5vw, 100px);
+  position: relative;
+}
+
+.title-slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(78, 205, 196, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(59, 111, 181, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(111, 168, 220, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.title-slide .title-logo {
+  height: clamp(50px, 8vh, 80px);
+  margin-bottom: clamp(24px, 4vh, 48px);
+  position: relative;
+}
+
+.title-slide h1 {
+  color: var(--light-text);
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(2.4rem, 5.5vw, 3.8rem);
+  font-weight: 800;
+  margin-bottom: 0.3em;
+  position: relative;
+  max-width: 18ch;
+  letter-spacing: -0.02em;
+}
+
+.title-slide .subtitle {
+  color: var(--accent-cyan);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  font-weight: 400;
+  margin-bottom: 1.5em;
+  position: relative;
+}
+
+.title-slide .meta {
+  color: var(--light-text-50);
+  font-size: clamp(0.85rem, 1.2vw, 1.05rem);
+  position: relative;
+}
+
+/* Prompt progression slide */
+.progression-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0.8em;
+}
+
+.progression-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.progression-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #CBD5E0;
+}
+
+.progression-dot.dot-bad { background: var(--accent-red); }
+.progression-dot.dot-mid { background: var(--accent-amber); }
+.progression-dot.dot-good { background: var(--accent-green); }
+.progression-dot.dot-active { transform: scale(1.3); }
+
+/* Annotation callouts within prompt blocks */
+.prompt-annotation {
+  color: var(--accent-cyan);
+  font-style: italic;
+  font-size: 0.85em;
+}
+
+/* Why it's better callouts */
+.why-better {
+  margin-top: 0.8em;
+  padding: clamp(8px, 1vh, 14px) clamp(12px, 1.5vw, 20px);
+  background: rgba(56, 161, 105, 0.06);
+  border-radius: 6px;
+  border: 1px solid rgba(56, 161, 105, 0.15);
+}
+
+.why-better h4 {
+  color: var(--accent-green);
+  font-size: clamp(0.82rem, 1.1vw, 0.95rem);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.3em;
+}
+
+.why-better ul li::before {
+  background: var(--accent-green);
+}
+
+.why-better li {
+  font-size: clamp(0.85rem, 1.15vw, 0.98rem);
+  color: var(--text-muted);
+}
+
+/* Closing slide */
+.closing-slide {
+  background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-bg-lighter) 100%);
+}
+
+.closing-slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(78, 205, 196, 0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .layout-split { flex-direction: column; }
+  .layout-split > .content { flex: none; }
+  .layout-split > .stage { flex: 1; min-height: 40vh; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .comparison { grid-template-columns: 1fr; }
+  .roadmap { flex-direction: column; }
+  .roadmap-item:first-child { border-radius: 8px 8px 0 0; }
+  .roadmap-item:last-child { border-radius: 0 0 8px 8px; }
+  .model-grid { grid-template-columns: 1fr; }
+  body.overview-mode .slide { width: calc(50% - 8px); }
+}
+</style>
+</head>
+<body>
+
+<!-- Logo Watermark -->
+<img src="logo-horizontal.png" alt="CUNY AI Lab" class="logo-watermark" id="logoWatermark">
+
+<div id="deck">
+
+<!-- ==========================================
+     SLIDE 1 — TITLE
+     ========================================== -->
+<div class="slide title-slide">
+  <img src="logo-horizontal.png" alt="CUNY AI Lab" class="title-logo">
+  <h1>Composing System Prompts</h1>
+  <p class="subtitle">A Workshop for the CUNY AI Lab Sandbox</p>
+  <p class="meta">Workshop 1 of 3 &nbsp;&bull;&nbsp; March 16, 2026</p>
+</div>
+
+<!-- ==========================================
+     SLIDE 2 — WORKSHOP ROADMAP
+     ========================================== -->
+<div class="slide layout-full-dark">
+  <span class="label label-cyan">Workshop Series</span>
+  <h2 style="margin-bottom: 0.8em;">Three Weeks, Three Skills</h2>
+  <div class="roadmap">
+    <div class="roadmap-item active">
+      <div class="week-label">March 16 &mdash; This Week</div>
+      <h4>Composing System Prompts</h4>
+      <p>Define how the AI thinks, responds, and engages with your students</p>
+    </div>
+    <div class="roadmap-item">
+      <div class="week-label">March 23</div>
+      <h4>Curating Knowledge Collections</h4>
+      <p>Upload syllabi, readings, and source materials the AI can draw from</p>
+    </div>
+    <div class="roadmap-item">
+      <div class="week-label">March 30</div>
+      <h4>Customizing Agentic Tools</h4>
+      <p>Build specialized skills and workflows tailored to your courses</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 3 — WHAT IS A SYSTEM PROMPT?
+     ========================================== -->
+<div class="slide layout-split">
+  <div class="content">
+    <span class="label label-cyan">The Basics</span>
+    <h2>What Is a System Prompt?</h2>
+    <p style="margin-bottom: 0.8em;">A <strong>system prompt</strong> is a set of instructions you write <em>before</em> a conversation begins. The user never sees it, but it shapes every response the AI gives.</p>
+    <blockquote>Think of it as the <strong>briefing memo</strong> you hand a teaching assistant on their first day: who they are, what they should do, how they should behave, and what&rsquo;s off-limits.</blockquote>
+    <div class="tip-box" style="margin-top: 1em;">
+      <p><strong>Key distinction:</strong> The <em>user prompt</em> is what someone types in the chat. The <em>system prompt</em> is what you, the instructor, compose behind the scenes to guide the AI&rsquo;s behavior across the entire conversation.</p>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="screenshot-placeholder">
+      <div class="placeholder-icon">&#128247;</div>
+      <div class="placeholder-text"><strong>Screenshot needed:</strong><br>Diagram showing System Prompt &rarr; Model &rarr; User sees response (but not the system prompt)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 4 — WHERE IT LIVES IN OPEN WEBUI
+     ========================================== -->
+<div class="slide layout-split">
+  <div class="content">
+    <span class="label label-cyan">Open WebUI</span>
+    <h2>Where It Lives</h2>
+    <p style="margin-bottom: 0.6em;">In the CUNY AI Lab sandbox, you&rsquo;ll find the system prompt field in two places:</p>
+    <div class="card card-cyan" style="margin-bottom: 0.6em;">
+      <h4>1. Chat-Level System Prompt</h4>
+      <p>Click the <strong>settings gear</strong> at the top of any new conversation to set a prompt for that session.</p>
+    </div>
+    <div class="card" style="margin-bottom: 0.6em;">
+      <h4>2. Model Configuration</h4>
+      <p>Go to <strong>Workspace &rarr; Models</strong> to create a custom model with a permanent system prompt baked in.</p>
+    </div>
+    <div class="tip-box">
+      <p><strong>Pro tip:</strong> Creating a custom model lets you share your system prompt with students or colleagues &mdash; they just select the model and start chatting.</p>
+    </div>
+  </div>
+  <div class="stage">
+    <div class="screenshot-placeholder">
+      <div class="placeholder-icon">&#128247;</div>
+      <div class="placeholder-text"><strong>Screenshot needed:</strong><br>Open WebUI system prompt field in chat settings (gear icon &rarr; system prompt textarea)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 5 — WHY IT MATTERS
+     ========================================== -->
+<div class="slide layout-content">
+  <span class="label label-cyan">Why Bother?</span>
+  <h2>Same Tool, Different Pedagogy</h2>
+  <p style="margin-bottom: 1em; max-width: 800px;">You&rsquo;re building a revision assistant for your composition course. A student opens it and types: <strong>&ldquo;I&rsquo;m stuck on my introduction.&rdquo;</strong> Watch how the system prompt changes what happens next.</p>
+  <div class="comparison">
+    <div class="comparison-panel panel-muted">
+      <h4 style="color: var(--accent-red);">Without System Prompt</h4>
+      <p>&ldquo;Here&rsquo;s a strong introduction you could use: &lsquo;Throughout history, the question of racial identity has been central to American culture. In this essay, I will argue that...&rsquo;&rdquo;</p>
+      <p style="margin-top: 0.6em; font-style: italic; font-size: 0.85em; color: rgba(226, 232, 240, 0.4);">Writes the introduction for them &mdash; the student learns nothing</p>
+    </div>
+    <div class="comparison-panel">
+      <h4 style="color: var(--accent-green);">With System Prompt</h4>
+      <p>&ldquo;Let&rsquo;s work through this. What&rsquo;s the main argument you want your reader to encounter first? Try telling me in one sentence what your paper is really about &mdash; don&rsquo;t worry about making it perfect yet.&rdquo;</p>
+      <p style="margin-top: 0.6em; font-style: italic; font-size: 0.85em; color: rgba(226, 232, 240, 0.4);">Prompts the student to think &mdash; the writing stays theirs</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 6 — YOUR MODELS
+     ========================================== -->
+<div class="slide layout-full-dark">
+  <span class="label label-cyan">Your Toolkit</span>
+  <h2 style="margin-bottom: 0.8em;">Models in the CUNY AI Lab Sandbox</h2>
+  <p style="color: var(--light-text-50); max-width: 700px; margin-bottom: 1.2em;">All open-weight models. All support system prompts. Each has different strengths.</p>
+  <div class="model-grid">
+    <div class="model-card">
+      <h4>DeepSeek V3.2</h4>
+      <p>Academic writing, coding, multi-step reasoning</p>
+    </div>
+    <div class="model-card">
+      <h4>Kimi K2.5</h4>
+      <p>Visual reasoning, image understanding, long-document synthesis</p>
+    </div>
+    <div class="model-card">
+      <h4>GLM 5</h4>
+      <p>Complex reasoning, multi-step problem solving</p>
+    </div>
+    <div class="model-card" style="border-left-color: var(--accent-cyan);">
+      <h4>gpt-oss-120b</h4>
+      <p>Reproducible workflows, structured outputs</p>
+    </div>
+    <div class="model-card" style="border-left-color: var(--accent-cyan);">
+      <h4>Qwen3 235B</h4>
+      <p>Tool-using agents, multilingual tutoring</p>
+    </div>
+    <div class="model-card" style="border-left-color: var(--accent-light-blue);">
+      <h4>Gemma 3 27B</h4>
+      <p>Everyday writing, summarization, fast responses</p>
+    </div>
+    <div class="model-card" style="border-left-color: var(--accent-light-blue);">
+      <h4>Llama 3.1 70B</h4>
+      <p>General chat, drafting, revision, summarization</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 7 — SECTION DIVIDER: ANATOMY
+     ========================================== -->
+<div class="slide layout-divider">
+  <span class="section-label">Part I</span>
+  <h2>The Anatomy of a Good System Prompt</h2>
+  <div class="divider-line"></div>
+</div>
+
+<!-- ==========================================
+     SLIDE 8 — COMPOSITION: BAD
+     ========================================== -->
+<div class="slide layout-content">
+  <div class="progression-header">
+    <span class="label label-blue" style="margin-bottom: 0;">Composition &amp; Writing</span>
+    <div class="progression-dots">
+      <div class="progression-dot dot-bad dot-active"></div>
+      <div class="progression-dot"></div>
+      <div class="progression-dot"></div>
+    </div>
+  </div>
+  <h2>The Vague Prompt</h2>
+  <div class="prompt-block prompt-bad">
+    <span class="prompt-label">Weak</span>Help students write better.</div>
+  <div style="margin-top: 1em;">
+    <h4 style="color: var(--accent-red);">What goes wrong:</h4>
+    <ul>
+      <li>No role defined &mdash; the AI doesn&rsquo;t know if it&rsquo;s a tutor, editor, or ghostwriter</li>
+      <li>No pedagogical guidance &mdash; it will likely just rewrite the student&rsquo;s work</li>
+      <li>No scope &mdash; &ldquo;better&rdquo; could mean grammar, argumentation, style, or all of the above</li>
+      <li>No boundaries &mdash; nothing stops it from writing entire paragraphs for them</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 9 — COMPOSITION: MEDIOCRE
+     ========================================== -->
+<div class="slide layout-content">
+  <div class="progression-header">
+    <span class="label label-blue" style="margin-bottom: 0;">Composition &amp; Writing</span>
+    <div class="progression-dots">
+      <div class="progression-dot dot-bad"></div>
+      <div class="progression-dot dot-mid dot-active"></div>
+      <div class="progression-dot"></div>
+    </div>
+  </div>
+  <h2>Getting Warmer</h2>
+  <div class="prompt-block prompt-mid">
+    <span class="prompt-label">Mediocre</span>You are a writing tutor for a college composition course. Help students improve their essays. Ask them questions about their thesis before giving feedback. Don't write essays for them.</div>
+  <div class="why-better">
+    <h4>What improved</h4>
+    <ul>
+      <li>Has a role (writing tutor) and a context (college composition)</li>
+      <li>Includes a basic pedagogical move (ask about thesis first)</li>
+      <li>Sets one boundary (don&rsquo;t write for them)</li>
+    </ul>
+  </div>
+  <div style="margin-top: 0.6em;">
+    <h4 style="color: var(--accent-amber);">What&rsquo;s still missing:</h4>
+    <ul>
+      <li>No guidance on <em>how</em> to give feedback (line-level? structural? both?)</li>
+      <li>No sense of the student population or course level</li>
+      <li>No handling of common edge cases (student submits AI-generated text, asks for a &ldquo;quick fix&rdquo;)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 10 — COMPOSITION: GREAT
+     ========================================== -->
+<div class="slide layout-content">
+  <div class="progression-header">
+    <span class="label label-blue" style="margin-bottom: 0;">Composition &amp; Writing</span>
+    <div class="progression-dots">
+      <div class="progression-dot dot-bad"></div>
+      <div class="progression-dot dot-mid"></div>
+      <div class="progression-dot dot-good dot-active"></div>
+    </div>
+  </div>
+  <h2>A Prompt That Teaches</h2>
+  <div class="prompt-block prompt-good" style="font-size: clamp(0.75rem, 1.05vw, 0.9rem);">
+    <span class="prompt-label">Strong</span>You are a writing tutor for an introductory college composition course (English 101) at a public urban university. Your students are diverse &mdash; many are multilingual, first-generation, and working while studying.
+
+<strong style="color: var(--accent-cyan);">Your role:</strong> Help students become stronger writers by guiding them through revision, NOT by writing for them. Use Socratic questioning to help students discover problems and solutions in their own drafts.
+
+<strong style="color: var(--accent-cyan);">How to engage:</strong>
+- Always ask to see the assignment prompt and the student&rsquo;s draft before giving feedback.
+- Start with higher-order concerns (thesis, argument structure, evidence) before sentence-level issues.
+- When you identify a problem, ask the student a question about it rather than fixing it directly.
+- Offer no more than 2&ndash;3 focus areas per session so the student isn&rsquo;t overwhelmed.
+
+<strong style="color: var(--accent-cyan);">Boundaries:</strong>
+- Never write full paragraphs, thesis statements, or conclusions for the student.
+- If asked to &ldquo;just fix it,&rdquo; explain that revision is a skill that improves with practice.
+- Do not grade or assign scores. You are a tutor, not an evaluator.
+
+<strong style="color: var(--accent-cyan);">Tone:</strong> Warm, encouraging, and patient. Validate effort. Use &ldquo;I notice...&rdquo; and &ldquo;What if you tried...&rdquo; rather than &ldquo;You should...&rdquo;</div>
+</div>
+
+<!-- ==========================================
+     SLIDE 11 — SECTION DIVIDER: HISTORY
+     ========================================== -->
+<div class="slide layout-divider">
+  <span class="section-label">Example 2</span>
+  <h2>Primary Source Analysis</h2>
+  <div class="divider-line"></div>
+</div>
+
+<!-- ==========================================
+     SLIDE 12 — HISTORY: BAD
+     ========================================== -->
+<div class="slide layout-content">
+  <div class="progression-header">
+    <span class="label label-blue" style="margin-bottom: 0;">History</span>
+    <div class="progression-dots">
+      <div class="progression-dot dot-bad dot-active"></div>
+      <div class="progression-dot"></div>
+      <div class="progression-dot"></div>
+    </div>
+  </div>
+  <h2>The Vague Prompt</h2>
+  <div class="prompt-block prompt-bad">
+    <span class="prompt-label">Weak</span>Analyze historical documents.</div>
+  <div style="margin-top: 1em;">
+    <h4 style="color: var(--accent-red);">What goes wrong:</h4>
+    <ul>
+      <li>No methodological framework &mdash; the AI won&rsquo;t know whether to do close reading, contextualization, or sourcing</li>
+      <li>No period or geographic focus &mdash; responses will be generic</li>
+      <li>No guidance on handling AI limitations (hallucinated dates, invented sources)</li>
+      <li>No distinction between student analysis and AI-generated analysis</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 13 — HISTORY: MEDIOCRE
+     ========================================== -->
+<div class="slide layout-content">
+  <div class="progression-header">
+    <span class="label label-blue" style="margin-bottom: 0;">History</span>
+    <div class="progression-dots">
+      <div class="progression-dot dot-bad"></div>
+      <div class="progression-dot dot-mid dot-active"></div>
+      <div class="progression-dot"></div>
+    </div>
+  </div>
+  <h2>Getting Warmer</h2>
+  <div class="prompt-block prompt-mid">
+    <span class="prompt-label">Mediocre</span>You are a history teaching assistant. Help students analyze primary sources from American history. Ask them to consider the author, audience, and context of each document. Don't just summarize the document for them.</div>
+  <div class="why-better">
+    <h4>What improved</h4>
+    <ul>
+      <li>Defines a role and a disciplinary scope (American history)</li>
+      <li>References a real methodology (author/audience/context)</li>
+      <li>Sets a boundary against summarization</li>
+    </ul>
+  </div>
+  <div style="margin-top: 0.6em;">
+    <h4 style="color: var(--accent-amber);">What&rsquo;s still missing:</h4>
+    <ul>
+      <li>No instructions for handling uncertainty or limits of AI knowledge</li>
+      <li>No scaffolding strategy &mdash; how should it guide a student through analysis step by step?</li>
+      <li>Doesn&rsquo;t address historiographical perspective or bias</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 14 — HISTORY: GREAT
+     ========================================== -->
+<div class="slide layout-content">
+  <div class="progression-header">
+    <span class="label label-blue" style="margin-bottom: 0;">History</span>
+    <div class="progression-dots">
+      <div class="progression-dot dot-bad"></div>
+      <div class="progression-dot dot-mid"></div>
+      <div class="progression-dot dot-good dot-active"></div>
+    </div>
+  </div>
+  <h2>A Prompt That Teaches Historical Thinking</h2>
+  <div class="prompt-block prompt-good" style="font-size: clamp(0.75rem, 1.05vw, 0.9rem);">
+    <span class="prompt-label">Strong</span>You are a teaching assistant for an undergraduate U.S. history survey course. You help students develop historical thinking skills by guiding them through primary source analysis.
+
+<strong style="color: var(--accent-cyan);">Methodology &mdash; Use the SOAPS framework:</strong>
+When a student shares a primary source, walk them through these questions one at a time:
+- <strong>Speaker:</strong> Who created this document? What do we know about them?
+- <strong>Occasion:</strong> What was happening when this was written? What events prompted it?
+- <strong>Audience:</strong> Who was this intended for? How might that shape its content?
+- <strong>Purpose:</strong> Why was this created? What was the author trying to achieve?
+- <strong>Significance:</strong> Why does this document matter historically? What does it reveal?
+
+<strong style="color: var(--accent-cyan);">Pedagogical approach:</strong>
+- Ask the student each question and let them attempt an answer before offering guidance.
+- Encourage them to cite specific passages from the document as evidence.
+- Help them distinguish between what the document says and what it reveals about its time.
+
+<strong style="color: var(--accent-cyan);">Critical rules:</strong>
+- If you are unsure about a historical fact, say so explicitly. Never invent dates, names, or events.
+- Do not provide a &ldquo;complete analysis.&rdquo; Your job is to model the questions historians ask, not to answer them for the student.
+- Acknowledge the limits of any single source. Prompt students to think about what voices are missing.</div>
+</div>
+
+<!-- ==========================================
+     SLIDE 15 — SECTION DIVIDER: LITERATURE
+     ========================================== -->
+<div class="slide layout-divider">
+  <span class="section-label">Example 3</span>
+  <h2>Close Reading &amp; Literary Analysis</h2>
+  <div class="divider-line"></div>
+</div>
+
+<!-- ==========================================
+     SLIDE 16 — LITERATURE: BAD
+     ========================================== -->
+<div class="slide layout-content">
+  <div class="progression-header">
+    <span class="label label-blue" style="margin-bottom: 0;">Literature &amp; Cultural Studies</span>
+    <div class="progression-dots">
+      <div class="progression-dot dot-bad dot-active"></div>
+      <div class="progression-dot"></div>
+      <div class="progression-dot"></div>
+    </div>
+  </div>
+  <h2>The Vague Prompt</h2>
+  <div class="prompt-block prompt-bad">
+    <span class="prompt-label">Weak</span>Help with literary analysis.</div>
+  <div style="margin-top: 1em;">
+    <h4 style="color: var(--accent-red);">What goes wrong:</h4>
+    <ul>
+      <li>The AI defaults to plot summary &mdash; the #1 problem in literature courses</li>
+      <li>No theoretical framework &mdash; formalist? historicist? postcolonial?</li>
+      <li>No guidance on textual evidence &mdash; students get vague claims instead of close reading</li>
+      <li>No handling of the tension between &ldquo;help me understand&rdquo; and &ldquo;write my paper&rdquo;</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 17 — LITERATURE: MEDIOCRE
+     ========================================== -->
+<div class="slide layout-content">
+  <div class="progression-header">
+    <span class="label label-blue" style="margin-bottom: 0;">Literature &amp; Cultural Studies</span>
+    <div class="progression-dots">
+      <div class="progression-dot dot-bad"></div>
+      <div class="progression-dot dot-mid dot-active"></div>
+      <div class="progression-dot"></div>
+    </div>
+  </div>
+  <h2>Getting Warmer</h2>
+  <div class="prompt-block prompt-mid">
+    <span class="prompt-label">Mediocre</span>You are a literature tutor. Help students analyze literary texts by focusing on themes, symbolism, and narrative techniques. Don't just summarize the plot. Ask students to point to specific passages.</div>
+  <div class="why-better">
+    <h4>What improved</h4>
+    <ul>
+      <li>Names specific analytical categories (themes, symbolism, narrative technique)</li>
+      <li>Addresses the plot-summary problem</li>
+      <li>Asks for textual evidence</li>
+    </ul>
+  </div>
+  <div style="margin-top: 0.6em;">
+    <h4 style="color: var(--accent-amber);">What&rsquo;s still missing:</h4>
+    <ul>
+      <li>No theoretical lens or critical framework</li>
+      <li>No guidance on how to scaffold analysis (where to start, how to deepen)</li>
+      <li>Doesn&rsquo;t address cultural context, which matters for cultural studies courses</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 18 — LITERATURE: GREAT
+     ========================================== -->
+<div class="slide layout-content">
+  <div class="progression-header">
+    <span class="label label-blue" style="margin-bottom: 0;">Literature &amp; Cultural Studies</span>
+    <div class="progression-dots">
+      <div class="progression-dot dot-bad"></div>
+      <div class="progression-dot dot-mid"></div>
+      <div class="progression-dot dot-good dot-active"></div>
+    </div>
+  </div>
+  <h2>A Prompt That Teaches Close Reading</h2>
+  <div class="prompt-block prompt-good" style="font-size: clamp(0.75rem, 1.05vw, 0.9rem);">
+    <span class="prompt-label">Strong</span>You are a teaching assistant for an undergraduate literature and cultural studies course. You help students develop close reading skills and connect texts to their cultural and historical contexts.
+
+<strong style="color: var(--accent-cyan);">How to guide close reading:</strong>
+- When a student shares a passage, begin with observation: &ldquo;What do you notice about the language here?&rdquo;
+- Guide them from observation &rarr; interpretation &rarr; argument. Don&rsquo;t skip steps.
+- Ask about specific formal elements: word choice, imagery, syntax, point of view, tone.
+- Then widen the lens: How does this passage connect to the work&rsquo;s larger themes? To its cultural moment?
+
+<strong style="color: var(--accent-cyan);">Critical framework:</strong>
+- Encourage students to consider: Who is speaking? Who is silenced? What power structures are visible?
+- Help students see texts as cultural artifacts, not just aesthetic objects.
+- When relevant, introduce concepts like representation, ideology, or intersectionality &mdash; but let the text lead.
+
+<strong style="color: var(--accent-cyan);">Boundaries:</strong>
+- Never provide a &ldquo;correct reading.&rdquo; Literature rewards multiple interpretations &mdash; help students build and defend theirs.
+- Do not summarize the plot. If a student asks &ldquo;what happens in chapter 3,&rdquo; redirect: &ldquo;What stood out to you when you read it?&rdquo;
+- Always ground claims in specific textual evidence. If the student makes a claim, ask: &ldquo;Where do you see that in the text?&rdquo;
+
+<strong style="color: var(--accent-cyan);">Tone:</strong> Intellectually curious and collegial. Model the kind of thinking you want to see.</div>
+</div>
+
+<!-- ==========================================
+     SLIDE 19 — SECTION DIVIDER: BUILDING BLOCKS
+     ========================================== -->
+<div class="slide layout-divider">
+  <span class="section-label">Part II</span>
+  <h2>The Building Blocks</h2>
+  <div class="divider-line"></div>
+</div>
+
+<!-- ==========================================
+     SLIDE 20 — THE FIVE COMPONENTS
+     ========================================== -->
+<div class="slide layout-grid">
+  <span class="label label-cyan">Components</span>
+  <h2 style="text-align: center; margin-bottom: 0.6em;">Five Things Every System Prompt Needs</h2>
+  <div class="grid-3" style="margin-top: 0.5em;">
+    <div class="block-card">
+      <span class="block-icon" role="img" aria-label="persona">&#129489;&#8205;&#127891;</span>
+      <h4>Role &amp; Persona</h4>
+      <p>Who is the AI? A tutor, a peer reviewer, a research assistant, a debate partner?</p>
+    </div>
+    <div class="block-card">
+      <span class="block-icon" role="img" aria-label="scope">&#127919;</span>
+      <h4>Scope &amp; Boundaries</h4>
+      <p>What should it do &mdash; and what should it refuse to do? Topic limits, ethical guardrails.</p>
+    </div>
+    <div class="block-card">
+      <span class="block-icon" role="img" aria-label="pedagogy">&#128218;</span>
+      <h4>Pedagogical Approach</h4>
+      <p>How should it teach? Socratic questioning, scaffolding, modeling, direct instruction?</p>
+    </div>
+  </div>
+  <div class="grid-2" style="margin-top: clamp(12px, 1.5vw, 20px); max-width: 640px; margin-left: auto; margin-right: auto;">
+    <div class="block-card">
+      <span class="block-icon" role="img" aria-label="tone">&#128172;</span>
+      <h4>Tone &amp; Audience</h4>
+      <p>Register, formality, warmth. Are students multilingual? First-gen? Graduate-level?</p>
+    </div>
+    <div class="block-card">
+      <span class="block-icon" role="img" aria-label="format">&#128196;</span>
+      <h4>Output Format</h4>
+      <p>Bullet points or prose? Citation style? Response length? Structured templates?</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 21 — ROLE & PERSONA (deep dive)
+     ========================================== -->
+<div class="slide layout-split">
+  <div class="content">
+    <span class="label label-cyan">Building Block 1</span>
+    <h2>Role &amp; Persona</h2>
+    <p style="margin-bottom: 0.8em;">The first sentence of your system prompt is the most important. It tells the AI <em>who it is</em> and immediately shapes everything that follows.</p>
+    <div class="card card-cyan" style="margin-bottom: 0.5em;">
+      <h4>Tutor</h4>
+      <p>&ldquo;You are a patient writing tutor who guides through questions, never writes for students.&rdquo;</p>
+    </div>
+    <div class="card" style="margin-bottom: 0.5em;">
+      <h4>Research Assistant</h4>
+      <p>&ldquo;You are a research assistant who helps locate, organize, and evaluate secondary sources.&rdquo;</p>
+    </div>
+    <div class="card card-navy" style="margin-bottom: 0.5em;">
+      <h4>Devil&rsquo;s Advocate</h4>
+      <p>&ldquo;You are a debate partner who challenges the student&rsquo;s argument with counterarguments and asks them to defend their position.&rdquo;</p>
+    </div>
+    <div class="tip-box">
+      <p><strong>Try this:</strong> Name the role, the course, and the institution. Specificity makes the AI more consistent.</p>
+    </div>
+  </div>
+  <div class="stage" style="flex-direction: column; padding: clamp(20px, 3vh, 40px);">
+    <div class="screenshot-placeholder" style="max-width: 90%; margin-bottom: 1em;">
+      <div class="placeholder-icon">&#128247;</div>
+      <div class="placeholder-text"><strong>Screenshot needed:</strong><br>Open WebUI conversation where a well-defined tutor persona is responding helpfully</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 22 — SCOPE & BOUNDARIES
+     ========================================== -->
+<div class="slide layout-split">
+  <div class="content">
+    <span class="label label-cyan">Building Block 2</span>
+    <h2>Scope &amp; Boundaries</h2>
+    <p style="margin-bottom: 0.8em;">Boundaries aren&rsquo;t about restricting the AI &mdash; they&rsquo;re about protecting the learning process.</p>
+    <h4 style="margin-top: 0.6em;">Things to define:</h4>
+    <ul>
+      <li><strong>Topic scope</strong> &mdash; &ldquo;Only discuss texts assigned in this course&rdquo;</li>
+      <li><strong>What not to produce</strong> &mdash; &ldquo;Never write full paragraphs for the student&rdquo;</li>
+      <li><strong>Academic integrity</strong> &mdash; &ldquo;If the student asks you to write their assignment, redirect them&rdquo;</li>
+      <li><strong>Epistemic honesty</strong> &mdash; &ldquo;If you&rsquo;re unsure about a fact, say so&rdquo;</li>
+    </ul>
+    <div class="warning-box" style="margin-top: 0.8em;">
+      <p><strong>Common mistake:</strong> Saying &ldquo;don&rsquo;t help with homework&rdquo; when you mean &ldquo;don&rsquo;t <em>do</em> the homework.&rdquo; Be precise about what you&rsquo;re restricting.</p>
+    </div>
+  </div>
+  <div class="stage" style="flex-direction: column; padding: clamp(20px, 3vh, 40px);">
+    <div class="screenshot-placeholder" style="max-width: 90%;">
+      <div class="placeholder-icon">&#128247;</div>
+      <div class="placeholder-text"><strong>Screenshot needed:</strong><br>Open WebUI conversation where the AI politely declines to write an essay and redirects the student</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 23 — PEDAGOGICAL APPROACH
+     ========================================== -->
+<div class="slide layout-grid">
+  <span class="label label-cyan">Building Block 3</span>
+  <h2 style="text-align: center;">Pedagogical Approach</h2>
+  <p style="text-align: center; max-width: 700px; margin: 0 auto 1em;">This is where your expertise as an educator makes the system prompt powerful. You&rsquo;re encoding your teaching philosophy into the AI&rsquo;s behavior.</p>
+  <div class="grid-2">
+    <div class="card card-cyan">
+      <h4>Socratic Method</h4>
+      <p>&ldquo;When a student makes a claim, respond with a question that pushes them to examine their reasoning. Never confirm or deny until they&rsquo;ve worked through it.&rdquo;</p>
+    </div>
+    <div class="card">
+      <h4>Scaffolding</h4>
+      <p>&ldquo;Break complex tasks into smaller steps. Only move to the next step when the student has completed the current one.&rdquo;</p>
+    </div>
+    <div class="card card-navy">
+      <h4>Modeling</h4>
+      <p>&ldquo;Show one example of how to analyze a passage, then ask the student to try the same approach with a different passage.&rdquo;</p>
+    </div>
+    <div class="card card-cyan">
+      <h4>Metacognitive Prompting</h4>
+      <p>&ldquo;Periodically ask: &lsquo;What strategy are you using here?&rsquo; or &lsquo;How did you decide to approach it this way?&rsquo;&rdquo;</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 24 — TONE & AUDIENCE
+     ========================================== -->
+<div class="slide layout-split">
+  <div class="content">
+    <span class="label label-cyan">Building Block 4</span>
+    <h2>Tone &amp; Audience</h2>
+    <p style="margin-bottom: 0.6em;">The same feedback delivered in different tones produces very different outcomes. Your students are real people with real anxieties about writing, analysis, and AI.</p>
+    <div class="comparison" style="grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div class="card" style="border-left-color: var(--accent-red);">
+        <h4 style="color: var(--accent-red);">Cold &amp; Clinical</h4>
+        <p style="font-size: 0.9rem;">&ldquo;Your thesis is weak and lacks specificity. Revise it.&rdquo;</p>
+      </div>
+      <div class="card" style="border-left-color: var(--accent-green);">
+        <h4 style="color: var(--accent-green);">Warm &amp; Constructive</h4>
+        <p style="font-size: 0.9rem;">&ldquo;I can see what you&rsquo;re going for here. What if you narrowed your focus to make it more specific?&rdquo;</p>
+      </div>
+    </div>
+    <div class="tip-box" style="margin-top: 0.6em;">
+      <p><strong>Consider your students:</strong> Multilingual learners, first-generation students, and students with writing anxiety all benefit from explicit warmth and validation in feedback.</p>
+    </div>
+  </div>
+  <div class="stage" style="flex-direction: column; padding: clamp(20px, 3vh, 40px); justify-content: center;">
+    <div class="screenshot-placeholder" style="max-width: 90%;">
+      <div class="placeholder-icon">&#128247;</div>
+      <div class="placeholder-text"><strong>Screenshot needed:</strong><br>Side-by-side Open WebUI responses showing different tone settings in action</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 25 — OUTPUT FORMAT
+     ========================================== -->
+<div class="slide layout-content">
+  <span class="label label-cyan">Building Block 5</span>
+  <h2>Output Format</h2>
+  <p style="margin-bottom: 1em; max-width: 800px;">You can control <em>how</em> the AI structures its responses. This is especially useful for consistency and for students who benefit from predictable formats.</p>
+  <div class="grid-2">
+    <div class="card card-cyan">
+      <h4>Structured Feedback Template</h4>
+      <div class="prompt-block" style="font-size: 0.85rem; margin-top: 0.5em; padding: 12px 16px;">
+        <span style="color: var(--accent-cyan);">&ldquo;Format your feedback as:</span>
+<strong>Strength:</strong> [one thing the student did well]
+<strong>Focus area:</strong> [one thing to improve]
+<strong>Next step:</strong> [a specific, actionable suggestion]
+<strong>Question:</strong> [something for the student to think about]&rdquo;</div>
+    </div>
+    <div class="card">
+      <h4>Other Format Options</h4>
+      <ul style="margin-top: 0.4em;">
+        <li>&ldquo;Keep responses under 200 words&rdquo;</li>
+        <li>&ldquo;Use bullet points for feedback, prose for explanations&rdquo;</li>
+        <li>&ldquo;Always cite using MLA/Chicago format&rdquo;</li>
+        <li>&ldquo;End each response with a question for the student&rdquo;</li>
+        <li>&ldquo;Use markdown headings to organize long responses&rdquo;</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 26 — SECTION DIVIDER: ADVANCED
+     ========================================== -->
+<div class="slide layout-divider">
+  <span class="section-label">Part III</span>
+  <h2>Advanced Techniques &amp; Tips</h2>
+  <div class="divider-line"></div>
+</div>
+
+<!-- ==========================================
+     SLIDE 27 — ADVANCED TECHNIQUES
+     ========================================== -->
+<div class="slide layout-grid">
+  <span class="label label-cyan">Going Further</span>
+  <h2 style="text-align: center; margin-bottom: 0.6em;">Power Moves</h2>
+  <div class="grid-2">
+    <div class="card card-cyan">
+      <h4>Conditional Behavior</h4>
+      <p>&ldquo;If the student submits a draft, give feedback. If they ask a conceptual question, use the Socratic method. If they seem frustrated, acknowledge it before continuing.&rdquo;</p>
+    </div>
+    <div class="card">
+      <h4>Conversation Phases</h4>
+      <p>&ldquo;In the first exchange, ask for the assignment prompt and draft. In subsequent exchanges, focus on one issue at a time.&rdquo;</p>
+    </div>
+    <div class="card card-navy">
+      <h4>Epistemic Guardrails</h4>
+      <p>&ldquo;If you are not certain about a factual claim, explicitly state your uncertainty. Never fabricate citations or attribute quotes.&rdquo;</p>
+    </div>
+    <div class="card card-cyan">
+      <h4>Multilingual Support</h4>
+      <p>&ldquo;If a student writes in a language other than English, respond in that language. Offer to discuss concepts in both languages to support comprehension.&rdquo;</p>
+    </div>
+  </div>
+  <div class="tip-box" style="max-width: 800px; margin: 0.8em auto 0;">
+    <p><strong>Remember:</strong> All seven models in the CUNY AI Lab sandbox support multilingual input and output &mdash; a major asset for CUNY&rsquo;s student population.</p>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 28 — COMMON PITFALLS
+     ========================================== -->
+<div class="slide layout-content">
+  <span class="label label-cyan">Watch Out</span>
+  <h2>Common Pitfalls</h2>
+  <div class="grid-2" style="margin-top: 1em;">
+    <div class="card" style="border-left-color: var(--accent-red);">
+      <h4>Too Long &amp; Too Detailed</h4>
+      <p>A 2,000-word system prompt can confuse the model. Aim for clarity over comprehensiveness. If it&rsquo;s getting long, prioritize the most important instructions.</p>
+    </div>
+    <div class="card" style="border-left-color: var(--accent-red);">
+      <h4>Contradictory Instructions</h4>
+      <p>&ldquo;Always give detailed feedback&rdquo; + &ldquo;Keep responses under 50 words&rdquo; = confused AI. Read your prompt for conflicts.</p>
+    </div>
+    <div class="card" style="border-left-color: var(--accent-amber);">
+      <h4>Forgetting the Student&rsquo;s Perspective</h4>
+      <p>Your prompt shapes the student&rsquo;s experience. Test it by asking the kinds of questions your students actually ask.</p>
+    </div>
+    <div class="card" style="border-left-color: var(--accent-amber);">
+      <h4>Set It and Forget It</h4>
+      <p>System prompts need iteration. Use them in real conversations, notice what breaks, and revise. It&rsquo;s a living document.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     SLIDE 29 — ROAD AHEAD
+     ========================================== -->
+<div class="slide layout-full-dark">
+  <span class="label label-cyan">Coming Up</span>
+  <h2 style="margin-bottom: 0.8em;">The Road Ahead</h2>
+  <div class="roadmap">
+    <div class="roadmap-item" style="opacity: 0.5;">
+      <div class="week-label">March 16 &mdash; Today</div>
+      <h4>System Prompts &#10003;</h4>
+      <p>Defining how the AI thinks and teaches</p>
+    </div>
+    <div class="roadmap-item active">
+      <div class="week-label">March 23 &mdash; Next Week</div>
+      <h4>Knowledge Collections</h4>
+      <p>Upload your syllabus, readings, and course materials so the AI can reference them directly</p>
+    </div>
+    <div class="roadmap-item">
+      <div class="week-label">March 30</div>
+      <h4>Agentic Tools &amp; Skills</h4>
+      <p>Build custom workflows: citation checkers, peer review simulations, assignment generators</p>
+    </div>
+  </div>
+  <p style="color: var(--light-text-50); margin-top: 1.5em; max-width: 600px;">Each workshop builds on the last. The system prompt you write today becomes the foundation for the knowledge-augmented model you build next week.</p>
+</div>
+
+<!-- ==========================================
+     SLIDE 30 — CLOSING / EXERCISE
+     ========================================== -->
+<div class="slide title-slide closing-slide">
+  <img src="logo-horizontal.png" alt="CUNY AI Lab" class="title-logo" style="margin-bottom: clamp(12px, 2vh, 24px);">
+  <h1 style="font-size: clamp(2rem, 4.5vw, 3.2rem); margin-bottom: 0.2em;">Let&rsquo;s Build One Together</h1>
+  <p class="subtitle" style="margin-bottom: 1em;">Open the CUNY AI Lab sandbox and compose a system prompt for your course</p>
+  <div style="position: relative; display: flex; gap: clamp(12px, 2vw, 24px); flex-wrap: wrap; justify-content: center; align-items: stretch;">
+    <div class="card" style="background: var(--dark-bg-lighter); border-left-color: var(--accent-cyan); text-align: left; max-width: 300px;">
+      <h4 style="color: var(--light-text); font-size: 0.9rem;">Exercise</h4>
+      <ol style="padding-left: 1.2em; list-style: decimal;">
+        <li style="color: var(--light-text-50); font-size: 0.82rem; margin-bottom: 0.2em;">Pick one assignment from your course</li>
+        <li style="color: var(--light-text-50); font-size: 0.82rem; margin-bottom: 0.2em;">Write a system prompt using the five building blocks</li>
+        <li style="color: var(--light-text-50); font-size: 0.82rem; margin-bottom: 0.2em;">Test it with a real student question</li>
+        <li style="color: var(--light-text-50); font-size: 0.82rem;">Iterate and refine</li>
+      </ol>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+      <div class="screenshot-placeholder screenshot-placeholder-dark" style="min-height: 120px; width: 160px; padding: 16px;">
+        <div class="placeholder-icon" style="font-size: 1.8rem;">&#128247;</div>
+        <div class="placeholder-text" style="color: var(--light-text-50); font-size: 0.8rem;">QR code to<br>sandbox</div>
+      </div>
+    </div>
+  </div>
+  <p class="meta" style="margin-top: 0.8em;">ailab.gc.cuny.edu</p>
+</div>
+
+</div><!-- /deck -->
+
+<!-- Navigation Bar -->
+<div id="nav-bar">
+  <span class="nav-info"><strong id="nav-current">1</strong> / <span id="nav-total"></span></span>
+  <div id="progress-track"><div id="progress-bar"></div></div>
+  <span class="nav-keys"><kbd>&larr;</kbd> <kbd>&rarr;</kbd> navigate &nbsp; <kbd>Esc</kbd> overview</span>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var slides = Array.from(document.querySelectorAll('.slide'));
+  var total = slides.length;
+  var current = 0;
+  var overviewMode = false;
+
+  document.getElementById('nav-total').textContent = total;
+
+  // --- Navigation ---
+  function goTo(index, instant) {
+    if (index < 0 || index >= total) return;
+    current = index;
+
+    slides.forEach(function(s, i) {
+      if (i === current) {
+        s.classList.add('active');
+        if (instant) { s.style.transition = 'none'; requestAnimationFrame(function() { s.style.transition = ''; }); }
+      } else {
+        s.classList.remove('active');
+      }
+    });
+
+    // Update nav
+    document.getElementById('nav-current').textContent = current + 1;
+    document.getElementById('progress-bar').style.width = ((current / (total - 1)) * 100) + '%';
+
+    // Update hash
+    history.replaceState(null, '', '#' + (current + 1));
+
+    // Hide watermark on title (first) and closing (last) slides
+    var logo = document.getElementById('logoWatermark');
+    if (current === 0 || current === total - 1) {
+      logo.classList.add('hidden');
+    } else {
+      logo.classList.remove('hidden');
+    }
+
+    // Show nav briefly
+    var nav = document.getElementById('nav-bar');
+    nav.classList.add('visible');
+    clearTimeout(nav._hideTimeout);
+    nav._hideTimeout = setTimeout(function() { nav.classList.remove('visible'); }, 2000);
+  }
+
+  function next() { goTo(current + 1); }
+  function prev() { goTo(current - 1); }
+
+  // --- Overview Mode ---
+  function toggleOverview() {
+    overviewMode = !overviewMode;
+    document.body.classList.toggle('overview-mode', overviewMode);
+
+    if (overviewMode) {
+      requestAnimationFrame(function() {
+        slides[current].scrollIntoView({ block: 'center', behavior: 'instant' });
+      });
+    }
+  }
+
+  // --- Keyboard ---
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { e.preventDefault(); toggleOverview(); return; }
+    if (overviewMode) { e.preventDefault(); return; }
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+    else if (e.key === 'End') { e.preventDefault(); goTo(total - 1); }
+  });
+
+  // --- Touch/Swipe ---
+  var touchStartX = 0;
+  var touchStartY = 0;
+  document.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      if (dx < 0) next(); else prev();
+    }
+  }, { passive: true });
+
+  // --- Hash routing ---
+  function readHash() {
+    var h = parseInt(location.hash.replace('#', ''), 10);
+    if (h >= 1 && h <= total) return h - 1;
+    return 0;
+  }
+
+  // --- Overview click-to-jump ---
+  slides.forEach(function(slide, i) {
+    slide.addEventListener('click', function(e) {
+      if (!overviewMode) return;
+      e.stopPropagation();
+      goTo(i, true);
+      toggleOverview();
+    });
+  });
+
+  // --- Init ---
+  var startSlide = readHash();
+  goTo(startSlide, true);
+
+  window.addEventListener('hashchange', function() { goTo(readHash()); });
+})();
+</script>
+
+</body>
+</html>
