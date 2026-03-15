@@ -14,7 +14,7 @@
 <body>
 
 <!-- Logo Watermark -->
-<img src="logo-horizontal.png" alt="CUNY AI Lab" class="logo-watermark" id="logoWatermark">
+<img src="images/logo-horizontal.png" alt="CUNY AI Lab" class="logo-watermark" id="logoWatermark">
 
 <div id="deck">
 
@@ -23,7 +23,7 @@
      ========================================== -->
 <div class="slide title-slide">
   <div class="title-slide-content">
-    <img src="logo-horizontal.png" alt="CUNY AI Lab" class="title-logo">
+    <img src="images/logo-horizontal.png" alt="CUNY AI Lab" class="title-logo">
     <h1>Composing System Prompts</h1>
     <p class="subtitle">A Workshop for the CUNY AI Lab Sandbox</p>
     <p class="meta">March 16, 2026</p>
@@ -143,15 +143,15 @@
   <div class="stage">
     <div class="carousel" data-interval="6000">
       <div class="carousel-item active">
-        <img src="4-a.png" alt="Chat-level system prompt field in Open WebUI">
+        <img src="images/4-a.png" alt="Chat-level system prompt field in Open WebUI">
         <div class="carousel-caption"><strong>Chat-Level System Prompt</strong><br>Click the controls icon at the top of any conversation to open the System Prompt field.</div>
       </div>
       <div class="carousel-item">
-        <img src="4-b.png" alt="Workspace Models page in Open WebUI">
+        <img src="images/4-b.png" alt="Workspace Models page in Open WebUI">
         <div class="carousel-caption"><strong>Model Configuration &mdash; Step 1</strong><br>Go to <strong>Workspace &rarr; Models</strong> to see all custom models. Click <strong>+ New Model</strong> to create one.</div>
       </div>
       <div class="carousel-item">
-        <img src="4-c.png" alt="Model creation form with system prompt field">
+        <img src="images/4-c.png" alt="Model creation form with system prompt field">
         <div class="carousel-caption"><strong>Model Configuration &mdash; Step 2</strong><br>In the model editor, the <strong>System Prompt</strong> field under Model Params is where your prompt lives permanently.</div>
       </div>
       <div class="carousel-dots"></div>
@@ -239,9 +239,9 @@
   </div>
   <h2>The Vague Prompt</h2>
   <div class="prompt-block prompt-bad"><span class="prompt-label">Weak</span>Help students write better.</div>
-  <div style="margin-top: 1em;" class="step-hidden" data-step>
+  <div style="margin-top: 1em;">
     <h4 style="color: var(--accent-red);">What goes wrong?</h4>
-    <ul class="stream-list">
+    <ul class="stream-list step-hidden" data-step>
       <li>No role assignment to contextualize the model for specific workflows or domain-knowledge</li>
       <li>No boundaries or pedagogical guidance to constrain the model from doing work for students</li>
       <li>No success criteria for the model to optimize toward</li>
@@ -263,17 +263,17 @@
   </div>
   <h2>Getting Warmer</h2>
   <div class="prompt-block prompt-mid"><span class="prompt-label">Getting There</span>You are a writing scaffold for a college composition course. Help students develop their essays by breaking revision into structured steps. Ask them to identify their thesis before giving feedback. Don't write essays for them.</div>
-  <div class="why-better step-hidden" data-step>
+  <div class="why-better">
     <h4>What improved?</h4>
-    <ul class="stream-list">
+    <ul class="stream-list step-hidden" data-step>
       <li>Assigns a role and disciplinary context</li>
       <li>Includes a basic pedagogical move</li>
       <li>Sets one boundary</li>
     </ul>
   </div>
-  <div style="margin-top: 0.6em;" class="step-hidden" data-step>
+  <div style="margin-top: 0.6em;">
     <h4 style="color: var(--accent-amber);">What's still missing?</h4>
-    <ul class="stream-list">
+    <ul class="stream-list step-hidden" data-step>
       <li>No procedural instructions for <em>how</em> to give feedback</li>
       <li>No awareness of student population or course level</li>
       <li>No edge-case handling</li>
@@ -333,9 +333,9 @@ The core problem: students treat revision as proofreading—fixing grammar and w
   </div>
   <h2>The Vague Prompt</h2>
   <div class="prompt-block prompt-bad"><span class="prompt-label">Weak</span>Analyze historical documents.</div>
-  <div style="margin-top: 1em;" class="step-hidden" data-step>
+  <div style="margin-top: 1em;">
     <h4 style="color: var(--accent-red);">What goes wrong?</h4>
-    <ul class="stream-list">
+    <ul class="stream-list step-hidden" data-step>
       <li>No methodological framework</li>
       <li>No period or geographic focus</li>
       <li>No guidance on handling hallucinated facts or invented sources</li>
@@ -357,17 +357,17 @@ The core problem: students treat revision as proofreading—fixing grammar and w
   </div>
   <h2>Getting Warmer</h2>
   <div class="prompt-block prompt-mid"><span class="prompt-label">Getting There</span>You are a history source-analysis tool. Help students analyze primary sources from American history. Ask them to consider the author, audience, and context of each document. Don't just summarize the document for them.</div>
-  <div class="why-better step-hidden" data-step>
+  <div class="why-better">
     <h4>What improved?</h4>
-    <ul class="stream-list">
+    <ul class="stream-list step-hidden" data-step>
       <li>Assigns a role and disciplinary scope</li>
       <li>References a real methodology</li>
       <li>Sets a boundary against summarization</li>
     </ul>
   </div>
-  <div style="margin-top: 0.6em;" class="step-hidden" data-step>
+  <div style="margin-top: 0.6em;">
     <h4 style="color: var(--accent-amber);">What's still missing?</h4>
-    <ul class="stream-list">
+    <ul class="stream-list step-hidden" data-step>
       <li>No procedural steps for guiding analysis</li>
       <li>No handling of uncertainty or AI limitations</li>
       <li>No attention to historiographical perspective</li>
@@ -438,9 +438,9 @@ The core problem: students extract facts from sources rather than analyzing them
   </div>
   <h2>The Vague Prompt</h2>
   <div class="prompt-block prompt-bad"><span class="prompt-label">Weak</span>Help with literary analysis.</div>
-  <div style="margin-top: 1em;" class="step-hidden" data-step>
+  <div style="margin-top: 1em;">
     <h4 style="color: var(--accent-red);">What goes wrong?</h4>
-    <ul class="stream-list">
+    <ul class="stream-list step-hidden" data-step>
       <li>Defaults to plot summary</li>
       <li>No theoretical or critical framework</li>
       <li>No requirement for textual evidence</li>
@@ -462,17 +462,17 @@ The core problem: students extract facts from sources rather than analyzing them
   </div>
   <h2>Getting Warmer</h2>
   <div class="prompt-block prompt-mid"><span class="prompt-label">Getting There</span>You are a close-reading scaffold. Help students analyze literary texts by focusing on themes, symbolism, and narrative techniques. Don't just summarize the plot. Ask students to point to specific passages.</div>
-  <div class="why-better step-hidden" data-step>
+  <div class="why-better">
     <h4>What improved?</h4>
-    <ul class="stream-list">
+    <ul class="stream-list step-hidden" data-step>
       <li>Names specific analytical categories</li>
       <li>Addresses the plot-summary problem</li>
       <li>Requires textual evidence</li>
     </ul>
   </div>
-  <div style="margin-top: 0.6em;" class="step-hidden" data-step>
+  <div style="margin-top: 0.6em;">
     <h4 style="color: var(--accent-amber);">What's still missing?</h4>
-    <ul class="stream-list">
+    <ul class="stream-list step-hidden" data-step>
       <li>No procedural steps for scaffolding analysis</li>
       <li>No critical or theoretical framework</li>
       <li>No attention to cultural context</li>
@@ -723,7 +723,7 @@ Question: [something for the student to think about]</div>
      ========================================== -->
 <div class="slide title-slide closing-slide">
   <div class="title-slide-content">
-  <img src="logo-horizontal.png" alt="CUNY AI Lab" class="title-logo" style="margin-bottom: clamp(12px, 2vh, 24px);">
+  <img src="images/logo-horizontal.png" alt="CUNY AI Lab" class="title-logo" style="margin-bottom: clamp(12px, 2vh, 24px);">
   <h1 style="font-size: clamp(2rem, 4.5vw, 3.2rem); margin-bottom: 0.2em;">Let&rsquo;s Build One Together</h1>
   <p class="subtitle" style="margin-bottom: 1em;">Open the CUNY AI Lab Sandbox and compose a system prompt for your course</p>
   <div style="position: relative; display: flex; gap: clamp(12px, 2vw, 24px); flex-wrap: wrap; justify-content: center; align-items: stretch;">
@@ -747,15 +747,30 @@ Question: [something for the student to think about]</div>
   </div>
 </div>
 
+<!-- Scrubber Timeline -->
+<div id="scrubber-container" class="scrubber-container">
+  <div class="scrubber-track">
+    <div id="scrubber-progress" class="scrubber-progress"></div>
+    <div class="scrubber-thumb">
+      <div class="scrubber-tooltip" id="scrubber-tooltip">Slide 1</div>
+    </div>
+  </div>
+</div>
 </div><!-- /deck -->
 
 <!-- Navigation Bar -->
 <div id="nav-bar">
+  <button id="arrow-prev" class="arrow-btn" aria-label="Previous slide" title="Previous slide (←)">&#8592;</button>
   <span class="nav-info"><strong id="nav-current">1</strong> / <span id="nav-total"></span></span>
   <div id="progress-track"><div id="progress-bar"></div></div>
-  <span class="nav-keys"><kbd>&larr;</kbd> <kbd>&rarr;</kbd> navigate &nbsp; <kbd>Esc</kbd> overview</span>
+  <span class="nav-keys"><kbd>&#8592;</kbd> <kbd>&#8594;</kbd> navigate &nbsp; <kbd>Esc</kbd> overview</span>
+  <button id="arrow-next" class="arrow-btn" aria-label="Next slide" title="Next slide (→)">&#8594;</button>
 </div>
 
 
+<script src="js/tabs.js"></script>
+<script src="js/carousel.js"></script>
+<script src="js/scrubber.js"></script>
+<script src="js/deck-engine.js"></script>
 </body>
 </html>
