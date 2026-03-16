@@ -1161,15 +1161,22 @@ body.overview-mode .slide {
   border-radius: 6px;
   overflow: hidden;
   cursor: pointer;
-  transform: scale(1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   flex-shrink: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  /* Render slide at full size internally, then scale to fit thumbnail */
+  width: 100vw;
+  height: 100vh;
+  transform: scale(0.22);
+  transform-origin: top left;
+  margin-right: calc(-100vw * 0.78 + 16px);
+  margin-bottom: calc(-100vh * 0.78 + 16px);
 }
 
 body.overview-mode .slide:hover {
-  transform: scale(1.03);
   box-shadow: 0 4px 20px rgba(78, 205, 196, 0.2);
+  outline: 2px solid rgba(78, 205, 196, 0.4);
+  outline-offset: 2px;
 }
 
 body.overview-mode .slide.active {
