@@ -13,28 +13,33 @@
 </head>
 <body>
 
-<!-- Logo Watermark -->
-<img src="images/logo-horizontal.png" alt="CUNY AI Lab" class="logo-watermark" id="logoWatermark">
+<a href="#deck" class="skip-link">Skip to slides</a>
 
-<div id="deck">
+<!-- Announcer for screen readers -->
+<div id="slide-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<!-- Logo Watermark -->
+<img src="images/logo-horizontal.png" alt="" class="logo-watermark" id="logoWatermark" aria-hidden="true">
+
+<div id="deck" role="region" aria-roledescription="slide deck" aria-label="Composing System Prompts presentation">
 
 <!-- ==========================================
      SLIDE 1 — TITLE
      ========================================== -->
-<div class="slide title-slide">
+<div class="slide title-slide" role="group" aria-roledescription="slide" aria-label="Slide 1: Title">
   <div class="title-slide-content">
     <img src="images/logo-horizontal.png" alt="CUNY AI Lab" class="title-logo">
     <h1>Composing System Prompts</h1>
     <p class="subtitle">A Workshop for the CUNY AI Lab Sandbox</p>
     <p class="meta">March 16, 2026</p>
-    <p class="meta" style="margin-top: 0.5em; font-size: 0.85em; opacity: 0.7;">Developed by Stefano Morello and Zach Muhlbauer</p>
+    <p class="meta" style="margin-top: 0.5em; font-size: 0.85em; color: #8a9bb0;">Developed by Stefano Morello and Zach Muhlbauer</p>
   </div>
 </div>
 
 <!-- ==========================================
      SLIDE 2 — WORKSHOP ROADMAP
      ========================================== -->
-<div class="slide layout-full-dark">
+<div class="slide layout-full-dark" role="group" aria-roledescription="slide" aria-label="Slide 2: Workshop Roadmap">
   <span class="label label-cyan">Workshop Series</span>
   <h2>Three Weeks, Three Skills</h2>
   <div class="roadmap">
@@ -59,7 +64,7 @@
 <!-- ==========================================
      SLIDE 3 — WHAT IS A SYSTEM PROMPT?
      ========================================== -->
-<div class="slide layout-split">
+<div class="slide layout-split" role="group" aria-roledescription="slide" aria-label="Slide 3: What Is a System Prompt?">
   <div class="content">
     <span class="label label-cyan">The Basics</span>
     <h2>What Is a System Prompt?</h2>
@@ -76,11 +81,11 @@
         <div class="theater-zone-label">Behind the curtain</div>
         <div class="theater-backstage-row">
           <div class="flow-node flow-instructor" style="width: auto; flex: 1;">
-            <div class="flow-node-icon" style="font-size: 1.4rem;">&#9997;&#65039;</div>
+            <div class="flow-node-icon" style="font-size: 1.4rem;" aria-hidden="true">&#9997;&#65039;</div>
             <div class="flow-node-label" style="font-size: 0.8rem;">Instructor</div>
           </div>
           <div class="theater-arrow-h">
-            <svg width="28" height="12" viewBox="0 0 28 12"><path d="M0 6 L20 6 M14 1 L22 6 L14 11" stroke="var(--accent-cyan)" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+            <svg width="28" height="12" viewBox="0 0 28 12" aria-hidden="true"><path d="M0 6 L20 6 M14 1 L22 6 L14 11" stroke="var(--accent-cyan)" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
           </div>
           <div class="flow-node flow-prompt" style="width: auto; flex: 2;">
             <span class="flow-hidden-badge">Hidden</span>
@@ -99,19 +104,19 @@
       <div class="theater-frontstage">
         <div class="theater-conversation">
           <div class="theater-msg theater-msg-user">
-            <span class="theater-msg-who">&#128100; Student</span>
+            <span class="theater-msg-who"><span aria-hidden="true">&#128100;</span> Student</span>
             <span class="theater-msg-text">&ldquo;I&rsquo;m stuck on my intro&hellip;&rdquo;</span>
           </div>
         </div>
         <!-- AI Model sits between user prompt and response -->
         <div class="flow-node flow-model" style="width: 100%; margin: clamp(6px, 1vh, 10px) 0;">
-          <div class="flow-node-icon" style="font-size: 1.3rem;">&#129302;</div>
+          <div class="flow-node-icon" style="font-size: 1.3rem;" aria-hidden="true">&#129302;</div>
           <div class="flow-node-label" style="font-size: 0.82rem;">AI Model</div>
           <div class="flow-node-desc" style="font-size: 0.68rem;">Shaped by hidden system prompt</div>
         </div>
         <div class="theater-conversation">
           <div class="theater-msg theater-msg-ai">
-            <span class="theater-msg-who">&#129302; Response</span>
+            <span class="theater-msg-who"><span aria-hidden="true">&#129302;</span> Response</span>
             <span class="theater-msg-text">&ldquo;What&rsquo;s the main argument you want your reader to encounter first?&rdquo;</span>
           </div>
         </div>
@@ -124,7 +129,7 @@
 <!-- ==========================================
      SLIDE 4 — WHERE IT LIVES IN OPEN WEBUI
      ========================================== -->
-<div class="slide layout-split">
+<div class="slide layout-split" role="group" aria-roledescription="slide" aria-label="Slide 4: Where It Lives">
   <div class="content">
     <span class="label label-cyan">Open WebUI</span>
     <h2>Where It Lives</h2>
@@ -163,7 +168,7 @@
 <!-- ==========================================
      SLIDE 5 — WHY IT MATTERS
      ========================================== -->
-<div class="slide layout-content">
+<div class="slide layout-content" role="group" aria-roledescription="slide" aria-label="Slide 5: Why System Prompts Matter">
   <span class="label label-cyan">Why Bother?</span>
   <h2>Why System Prompts Matter</h2>
   <div class="comparison" data-steps="2">
@@ -181,7 +186,7 @@
 <!-- ==========================================
      SLIDE 6 — YOUR MODELS
      ========================================== -->
-<div class="slide layout-full-dark">
+<div class="slide layout-full-dark" role="group" aria-roledescription="slide" aria-label="Slide 6: Models in the Sandbox">
   <span class="label label-cyan">Your Toolkit</span>
   <h2>Models in the CUNY AI Lab Sandbox</h2>
   <p style="color: var(--light-text-50); max-width: 700px; margin-bottom: 1.2em;">All open-weight models. No data retained on external servers. Each has different constraints and affordances.</p>
@@ -220,7 +225,7 @@
 <!-- ==========================================
      SLIDE 7 — SECTION DIVIDER: ANATOMY
      ========================================== -->
-<div class="slide layout-divider">
+<div class="slide layout-divider" role="group" aria-roledescription="slide" aria-label="Slide 7: Part I - The Anatomy of a Good System Prompt">
   <span class="section-label">Part I</span>
   <h2>The Anatomy of a Good System Prompt</h2>
   <div class="divider-line"></div>
@@ -229,7 +234,7 @@
 <!-- ==========================================
      SLIDE 8 — SECTION DIVIDER: COMPOSITION
      ========================================== -->
-<div class="slide layout-divider">
+<div class="slide layout-divider" role="group" aria-roledescription="slide" aria-label="Slide 8: Example 1 - Composition and Writing">
   <span class="section-label">Example 1</span>
   <h2>Composition &amp; Writing</h2>
   <div class="divider-line"></div>
@@ -238,10 +243,10 @@
 <!-- ==========================================
      SLIDE 9 — COMPOSITION: BAD
      ========================================== -->
-<div class="slide layout-content">
+<div class="slide layout-content" role="group" aria-roledescription="slide" aria-label="Slide 9: Composition - The Vague Prompt">
   <div class="progression-header">
     <span class="label label-blue" style="margin-bottom: 0;">Composition &amp; Writing</span>
-    <div class="progression-dots">
+    <div class="progression-dots" aria-hidden="true">
       <div class="progression-dot dot-bad dot-active"></div>
       <div class="progression-dot"></div>
       <div class="progression-dot"></div>
@@ -262,10 +267,10 @@
 <!-- ==========================================
      SLIDE 9 — COMPOSITION: MEDIOCRE
      ========================================== -->
-<div class="slide layout-content">
+<div class="slide layout-content" role="group" aria-roledescription="slide" aria-label="Slide 10: Composition - Getting Warmer">
   <div class="progression-header">
     <span class="label label-blue" style="margin-bottom: 0;">Composition &amp; Writing</span>
-    <div class="progression-dots">
+    <div class="progression-dots" aria-hidden="true">
       <div class="progression-dot dot-bad"></div>
       <div class="progression-dot dot-mid dot-active"></div>
       <div class="progression-dot"></div>
@@ -294,10 +299,10 @@
 <!-- ==========================================
      SLIDE 10 — COMPOSITION: GREAT
      ========================================== -->
-<div class="slide layout-content">
+<div class="slide layout-content" role="group" aria-roledescription="slide" aria-label="Slide 11: Composition - A Prompt That Fosters Revision">
   <div class="progression-header">
     <span class="label label-blue" style="margin-bottom: 0;">Composition &amp; Writing</span>
-    <div class="progression-dots">
+    <div class="progression-dots" aria-hidden="true">
       <div class="progression-dot dot-bad"></div>
       <div class="progression-dot dot-mid"></div>
       <div class="progression-dot dot-good dot-active"></div>
@@ -323,7 +328,7 @@ The core problem: students treat revision as proofreading, fixing grammar and wo
 <!-- ==========================================
      SLIDE 11 — SECTION DIVIDER: HISTORY
      ========================================== -->
-<div class="slide layout-divider">
+<div class="slide layout-divider" role="group" aria-roledescription="slide" aria-label="Slide 12: Example 2 - Primary Source Analysis">
   <span class="section-label">Example 2</span>
   <h2>Primary Source Analysis</h2>
   <div class="divider-line"></div>
@@ -332,10 +337,10 @@ The core problem: students treat revision as proofreading, fixing grammar and wo
 <!-- ==========================================
      SLIDE 12 — HISTORY: BAD
      ========================================== -->
-<div class="slide layout-content">
+<div class="slide layout-content" role="group" aria-roledescription="slide" aria-label="Slide 13: History - The Vague Prompt">
   <div class="progression-header">
     <span class="label label-blue" style="margin-bottom: 0;">History</span>
-    <div class="progression-dots">
+    <div class="progression-dots" aria-hidden="true">
       <div class="progression-dot dot-bad dot-active"></div>
       <div class="progression-dot"></div>
       <div class="progression-dot"></div>
@@ -356,10 +361,10 @@ The core problem: students treat revision as proofreading, fixing grammar and wo
 <!-- ==========================================
      SLIDE 13 — HISTORY: MEDIOCRE
      ========================================== -->
-<div class="slide layout-content">
+<div class="slide layout-content" role="group" aria-roledescription="slide" aria-label="Slide 14: History - Getting Warmer">
   <div class="progression-header">
     <span class="label label-blue" style="margin-bottom: 0;">History</span>
-    <div class="progression-dots">
+    <div class="progression-dots" aria-hidden="true">
       <div class="progression-dot dot-bad"></div>
       <div class="progression-dot dot-mid dot-active"></div>
       <div class="progression-dot"></div>
@@ -388,10 +393,10 @@ The core problem: students treat revision as proofreading, fixing grammar and wo
 <!-- ==========================================
      SLIDE 14 — HISTORY: GREAT
      ========================================== -->
-<div class="slide layout-content">
+<div class="slide layout-content" role="group" aria-roledescription="slide" aria-label="Slide 15: History - A Prompt That Fosters Historical Thinking">
   <div class="progression-header">
     <span class="label label-blue" style="margin-bottom: 0;">History</span>
-    <div class="progression-dots">
+    <div class="progression-dots" aria-hidden="true">
       <div class="progression-dot dot-bad"></div>
       <div class="progression-dot dot-mid"></div>
       <div class="progression-dot dot-good dot-active"></div>
@@ -425,7 +430,7 @@ The core problem: students extract facts from sources rather than analyzing them
 <!-- ==========================================
      SLIDE 15 — SECTION DIVIDER: LITERATURE
      ========================================== -->
-<div class="slide layout-divider">
+<div class="slide layout-divider" role="group" aria-roledescription="slide" aria-label="Slide 16: Example 3 - Close Reading and Literary Analysis">
   <span class="section-label">Example 3</span>
   <h2>Close Reading &amp; Literary Analysis</h2>
   <div class="divider-line"></div>
@@ -434,10 +439,10 @@ The core problem: students extract facts from sources rather than analyzing them
 <!-- ==========================================
      SLIDE 16 — LITERATURE: BAD
      ========================================== -->
-<div class="slide layout-content">
+<div class="slide layout-content" role="group" aria-roledescription="slide" aria-label="Slide 17: Literature - The Vague Prompt">
   <div class="progression-header">
     <span class="label label-blue" style="margin-bottom: 0;">Literature &amp; Cultural Studies</span>
-    <div class="progression-dots">
+    <div class="progression-dots" aria-hidden="true">
       <div class="progression-dot dot-bad dot-active"></div>
       <div class="progression-dot"></div>
       <div class="progression-dot"></div>
@@ -458,10 +463,10 @@ The core problem: students extract facts from sources rather than analyzing them
 <!-- ==========================================
      SLIDE 17 — LITERATURE: MEDIOCRE
      ========================================== -->
-<div class="slide layout-content">
+<div class="slide layout-content" role="group" aria-roledescription="slide" aria-label="Slide 18: Literature - Getting Warmer">
   <div class="progression-header">
     <span class="label label-blue" style="margin-bottom: 0;">Literature &amp; Cultural Studies</span>
-    <div class="progression-dots">
+    <div class="progression-dots" aria-hidden="true">
       <div class="progression-dot dot-bad"></div>
       <div class="progression-dot dot-mid dot-active"></div>
       <div class="progression-dot"></div>
@@ -490,10 +495,10 @@ The core problem: students extract facts from sources rather than analyzing them
 <!-- ==========================================
      SLIDE 18 — LITERATURE: GREAT
      ========================================== -->
-<div class="slide layout-content">
+<div class="slide layout-content" role="group" aria-roledescription="slide" aria-label="Slide 19: Literature - A Prompt That Fosters Close Reading">
   <div class="progression-header">
     <span class="label label-blue" style="margin-bottom: 0;">Literature &amp; Cultural Studies</span>
-    <div class="progression-dots">
+    <div class="progression-dots" aria-hidden="true">
       <div class="progression-dot dot-bad"></div>
       <div class="progression-dot dot-mid"></div>
       <div class="progression-dot dot-good dot-active"></div>
@@ -525,7 +530,7 @@ The core problem: students default to summarizing content or importing biographi
 <!-- ==========================================
      SLIDE 19 — SECTION DIVIDER: BUILDING BLOCKS
      ========================================== -->
-<div class="slide layout-divider">
+<div class="slide layout-divider" role="group" aria-roledescription="slide" aria-label="Slide 20: Part II - Drafting Your System Prompt">
   <span class="section-label">Part II</span>
   <h2>Drafting Your System Prompt</h2>
   <div class="divider-line"></div>
@@ -534,7 +539,7 @@ The core problem: students default to summarizing content or importing biographi
 <!-- ==========================================
      SLIDE 20 — THE FIVE COMPONENTS
      ========================================== -->
-<div class="slide layout-content" style="justify-content: center; align-items: center; text-align: center;">
+<div class="slide layout-content" role="group" aria-roledescription="slide" aria-label="Slide 21: Core Components of a System Prompt" style="justify-content: center; align-items: center; text-align: center;">
   <span class="label label-cyan">Structure</span>
   <h2>Core Components of a System Prompt</h2>
   <p style="margin-bottom: 1.4em; max-width: 600px; margin-left: auto; margin-right: auto;">Each system prompt is built from modular components. We&rsquo;ll draft yours one piece at a time.</p>
@@ -550,7 +555,7 @@ The core problem: students default to summarizing content or importing biographi
 <!-- ==========================================
      SLIDE 21 — CONTEXT & PROBLEM (drafting)
      ========================================== -->
-<div class="slide layout-split">
+<div class="slide layout-split" role="group" aria-roledescription="slide" aria-label="Slide 22: Context and Problem">
   <div class="content">
     <span class="label label-cyan">Component 1</span>
     <h2>Context &amp; Problem</h2>
@@ -578,7 +583,7 @@ The core problem: [specific learning challenge].</pre>
 <!-- ==========================================
      SLIDE 22 — PROCEDURE (drafting)
      ========================================== -->
-<div class="slide layout-split">
+<div class="slide layout-split" role="group" aria-roledescription="slide" aria-label="Slide 23: Procedure">
   <div class="content">
     <span class="label label-cyan">Component 2</span>
     <h2>Procedure</h2>
@@ -606,7 +611,7 @@ The core problem: [specific learning challenge].</pre>
 <!-- ==========================================
      SLIDE 23 — CONSTRAINTS (drafting)
      ========================================== -->
-<div class="slide layout-split">
+<div class="slide layout-split" role="group" aria-roledescription="slide" aria-label="Slide 24: Constraints">
   <div class="content">
     <span class="label label-cyan">Component 3</span>
     <h2>Constraints</h2>
@@ -634,7 +639,7 @@ The core problem: [specific learning challenge].</pre>
 <!-- ==========================================
      SLIDE 24 — TONE (drafting)
      ========================================== -->
-<div class="slide layout-split">
+<div class="slide layout-split" role="group" aria-roledescription="slide" aria-label="Slide 25: Tone">
   <div class="content">
     <span class="label label-cyan">Component 4</span>
     <h2>Tone</h2>
@@ -659,7 +664,7 @@ The core problem: [specific learning challenge].</pre>
 <!-- ==========================================
      SLIDE 25 — OUTPUT FORMAT (drafting)
      ========================================== -->
-<div class="slide layout-split">
+<div class="slide layout-split" role="group" aria-roledescription="slide" aria-label="Slide 26: Output Format">
   <div class="content">
     <span class="label label-cyan">Component 5</span>
     <h2>Output Format</h2>
@@ -688,7 +693,7 @@ Question: [something for the student to consider]</pre>
 <!-- ==========================================
      SLIDE 26 — SECTION DIVIDER: ADVANCED
      ========================================== -->
-<div class="slide layout-divider">
+<div class="slide layout-divider" role="group" aria-roledescription="slide" aria-label="Slide 27: Part III - Advanced Strategies and Tips">
   <span class="section-label">Part III</span>
   <h2>Advanced Strategies &amp; Tips</h2>
   <div class="divider-line"></div>
@@ -697,7 +702,7 @@ Question: [something for the student to consider]</pre>
 <!-- ==========================================
      SLIDE 27 — ADVANCED TECHNIQUES
      ========================================== -->
-<div class="slide layout-grid">
+<div class="slide layout-grid" role="group" aria-roledescription="slide" aria-label="Slide 28: Going Further">
   <h2>Going Further</h2>
   <div class="grid-2">
     <div class="card card-cyan">
@@ -722,7 +727,7 @@ Question: [something for the student to consider]</pre>
 <!-- ==========================================
      SLIDE 28 — COMMON PITFALLS
      ========================================== -->
-<div class="slide layout-content">
+<div class="slide layout-content" role="group" aria-roledescription="slide" aria-label="Slide 29: Common Pitfalls">
   <span class="label label-cyan">Watch Out</span>
   <h2>Common Pitfalls</h2>
   <div class="grid-2" style="margin-top: 1em;">
@@ -748,7 +753,7 @@ Question: [something for the student to consider]</pre>
 <!-- ==========================================
      SLIDE 29 — ROAD AHEAD
      ========================================== -->
-<div class="slide layout-full-dark">
+<div class="slide layout-full-dark" role="group" aria-roledescription="slide" aria-label="Slide 30: The Road Ahead">
   <span class="label label-cyan">Coming Up</span>
   <h2>The Road Ahead</h2>
   <div class="roadmap">
@@ -774,20 +779,20 @@ Question: [something for the student to consider]</pre>
 </div><!-- /deck -->
 
 <!-- Navigation Bar -->
-<div id="nav-bar">
-  <button id="arrow-prev" class="arrow-btn" aria-label="Previous slide" title="Previous slide (←)">&#8592;</button>
-  <span class="nav-info"><strong id="nav-current">1</strong> / <span id="nav-total"></span></span>
-  <div id="scrubber-container" class="scrubber-container">
+<nav id="nav-bar" aria-label="Slide navigation">
+  <button id="arrow-prev" class="arrow-btn" aria-label="Previous slide" title="Previous slide (&#8592;)">&#8592;</button>
+  <span class="nav-info" aria-live="polite"><strong id="nav-current">1</strong> / <span id="nav-total"></span></span>
+  <div id="scrubber-container" class="scrubber-container" role="slider" aria-label="Slide progress" aria-valuemin="1" aria-valuemax="1" aria-valuenow="1" aria-valuetext="Slide 1" tabindex="0">
     <div class="scrubber-track">
       <div id="scrubber-progress" class="scrubber-progress"></div>
-      <div class="scrubber-thumb">
+      <div class="scrubber-thumb" aria-hidden="true">
         <div class="scrubber-tooltip" id="scrubber-tooltip">Slide 1</div>
       </div>
     </div>
   </div>
-  <button id="arrow-next" class="arrow-btn" aria-label="Next slide" title="Next slide (→)">&#8594;</button>
-  <span class="nav-keys"><kbd>Esc</kbd> overview</span>
-</div>
+  <button id="arrow-next" class="arrow-btn" aria-label="Next slide" title="Next slide (&#8594;)">&#8594;</button>
+  <span class="nav-keys" aria-hidden="true"><kbd>Esc</kbd> overview</span>
+</nav>
 
 
 <script>
@@ -796,7 +801,12 @@ function copyTemplate(id) {
   if (!el) return;
   navigator.clipboard.writeText(el.innerText).then(function() {
     var btn = document.querySelector('[onclick="copyTemplate(\'' + id + '\')"]');
-    if (btn) { btn.textContent = 'Copied!'; setTimeout(function() { btn.textContent = 'Copy'; }, 1500); }
+    if (btn) {
+      btn.textContent = 'Copied!';
+      var announcer = document.getElementById('slide-announcer');
+      if (announcer) announcer.textContent = 'Template copied to clipboard';
+      setTimeout(function() { btn.textContent = 'Copy'; }, 1500);
+    }
   });
 }
 </script>

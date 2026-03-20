@@ -4,6 +4,43 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 90%; }
 html, body { height: 100%; overflow: hidden; }
+
+/* ============================================
+   ACCESSIBILITY UTILITIES
+   ============================================ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: -100%;
+  left: 16px;
+  z-index: 9999;
+  background: var(--accent-cyan);
+  color: var(--dark-bg);
+  padding: 8px 16px;
+  border-radius: 0 0 6px 6px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
 body {
   font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
   background: #0B1D3A;
@@ -77,9 +114,12 @@ body {
   flex-direction: column;
   justify-content: center;
   overflow-y: auto;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(78, 205, 196, 0.2) transparent;
 }
-.layout-split > .content::-webkit-scrollbar { display: none; }
+.layout-split > .content::-webkit-scrollbar { width: 4px; }
+.layout-split > .content::-webkit-scrollbar-thumb { background: rgba(78, 205, 196, 0.2); border-radius: 2px; }
+.layout-split > .content::-webkit-scrollbar-track { background: transparent; }
 
 .layout-split > .stage {
   flex: 1;
@@ -197,11 +237,14 @@ body {
   padding: clamp(20px, 3vh, 40px) clamp(40px, 5vw, 100px);
   justify-content: center;
   overflow-y: auto;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(78, 205, 196, 0.2) transparent;
   background-image:
     radial-gradient(ellipse at 90% 10%, rgba(59, 111, 181, 0.03) 0%, transparent 50%);
 }
-.layout-content::-webkit-scrollbar { display: none; }
+.layout-content::-webkit-scrollbar { width: 4px; }
+.layout-content::-webkit-scrollbar-thumb { background: rgba(78, 205, 196, 0.2); border-radius: 2px; }
+.layout-content::-webkit-scrollbar-track { background: transparent; }
 
 /* ============================================
    TYPOGRAPHY
@@ -1026,6 +1069,19 @@ blockquote {
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
   padding: 0;
+  position: relative;
+}
+
+/* Expand touch target to 44px without changing visual size */
+.carousel-dot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
 }
 
 .carousel-dot.active {
@@ -1095,6 +1151,7 @@ blockquote {
 
 #nav-bar.visible { opacity: 1; }
 #nav-bar:hover { opacity: 1; }
+#nav-bar:focus-within { opacity: 1; }
 
 #nav-bar .nav-info {
   font-size: 0.8rem;
