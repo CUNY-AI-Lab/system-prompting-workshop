@@ -24,9 +24,9 @@ The presentation is a custom deck engine built without any framework.
 - `js/deck-engine.js` — core navigation engine; exposes `window.deckEngine`, `window.goTo`, `window.next`, `window.prev`
 
 **CSS files:**
-- `css/styles.css` — all layout, components, typography, and design tokens
+- `css/styles.css` — all layout, components, typography, design tokens, and accessibility utilities
 - `css/responsive.css` — breakpoint overrides
-- `css/animations.css` — transition/animation definitions
+- `css/animations.css` — transition/animation definitions + `prefers-reduced-motion` overrides
 
 **Inline script** in `index.html` (before JS tags): `copyTemplate(id)` — clipboard copy for drafting station templates.
 
@@ -48,11 +48,26 @@ Two mechanisms, both managed by `deck-engine.js`:
 
 To hide content until clicked: add `step-hidden data-step` to the element (typically a `<ul>`). The heading above it should have no hidden classes — it stays visible.
 
+## Accessibility Layer
+
+Every slide has `role="group" aria-roledescription="slide" aria-label="Slide N: Title"`. These labels are sequential (Slide 1 through Slide 30) and must be updated when slides are added, removed, or reordered.
+
+Key accessibility infrastructure:
+- `#slide-announcer` — `aria-live="polite"` div, updated by `deck-engine.js` on every slide change
+- `aria-current="step"` — set/removed on the active slide by JS
+- Nav bar is a `<nav aria-label="Slide navigation">` element (not a div)
+- Scrubber has `role="slider"` with full ARIA value attributes, updated by JS
+- Decorative emoji use `aria-hidden="true"`; adjacent text labels carry the meaning
+- `.sr-only` and `.skip-link` utility classes live in `css/styles.css`
+- `prefers-reduced-motion` in `css/animations.css` disables all transitions and animations
+
+When adding a new slide: add the `role="group" aria-roledescription="slide" aria-label="Slide N: Title"` attributes and renumber all subsequent slides.
+
 ## Conventions
 
-- No em dashes (`—`) anywhere in slide content
+- No em dashes anywhere in slide content
 - Tone lines belong as the last bullet under `Constraints:`, not as a separate section
-- All three "good prompt" slides follow: role/audience → blank line → core problem → Procedure → Framework → Constraints (tone as last bullet)
+- All three "good prompt" slides follow: role/audience, blank line, core problem, Procedure, Framework, Constraints (tone as last bullet)
 - History example uses Wineburg's historical thinking heuristics (sourcing, contextualization, close reading, corroboration) — not SOAPS/SOAPSTone
 - Drafting station slides: template first, "Your turn" tip-box after
 - `SLIDES.md` must be kept in sync with `index.html` after every content edit
