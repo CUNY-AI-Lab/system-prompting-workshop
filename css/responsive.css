@@ -5,6 +5,14 @@
   h3 { font-size: clamp(1rem, 2.2vw, 1.5rem); }
   .layout-split > .content { padding: clamp(16px, 2.5vh, 32px) clamp(20px, 2vw, 40px); }
   .layout-split > .stage { padding: clamp(16px, 2vh, 24px); }
+  .carousel-item img {
+    max-width: 96%;
+    max-height: 60vh;
+  }
+  .carousel-caption {
+    font-size: clamp(0.8rem, 1.8vw, 1rem);
+    max-width: 90%;
+  }
 }
 
 @media (max-width: 768px) {
@@ -45,6 +53,16 @@
 
   .tip-box { padding: clamp(12px, 2vw, 16px); }
 
+  .carousel-item img {
+    max-width: 98%;
+    max-height: 55vh;
+  }
+  .carousel-caption {
+    font-size: clamp(0.8rem, 2vw, 0.95rem);
+    max-width: 95%;
+    padding: 0.3em 0.6em;
+  }
+
   body.overview-mode .slide { width: calc(50% - 8px); }
 }
 
@@ -76,6 +94,17 @@
 
   .flow-node { padding: clamp(6px, 1.5vh, 10px) clamp(6px, 1vw, 12px); }
   .flow-node-label { font-size: 0.7rem; }
+
+  .carousel-item img {
+    max-width: 100%;
+    max-height: 50vh;
+  }
+  .carousel-caption {
+    font-size: clamp(0.75rem, 2.5vw, 0.9rem);
+    max-width: 100%;
+    padding: 0.25em 0.5em;
+    line-height: 1.4;
+  }
 
   .modal-prompt { width: 90vw; max-height: 85vh; }
 }
